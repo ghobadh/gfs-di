@@ -59,10 +59,3 @@ code. [See this link for help with compares](https://github.com/springframeworkg
 * [Spring Core Advanced](https://www.udemy.com/spring-core-advanced-beyond-the-basics/?couponCode=GITHUB_REPO_SF5B2G) -
   Go beyond the basics! Learn about Aspect Oriented Programming, Spring Security, using Spring Events, JMS and more!
 
-## Connect with Spring Framework Guru
-
-* Spring Framework Guru [Blog](https://springframework.guru/)
-* Subscribe to Spring Framework Guru on [YouTube](https://www.youtube.com/channel/UCrXb8NaMPQCQkT8yMP_hSkw)
-* Like Spring Framework Guru on [Facebook](https://www.facebook.com/springframeworkguru/)
-* Follow Spring Framework Guru on [Twitter](https://twitter.com/spring_guru)
-* Connect with John Thompson on [LinkedIn](http://www.linkedin.com/in/springguru)
