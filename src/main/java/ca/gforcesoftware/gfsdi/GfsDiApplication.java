@@ -1,9 +1,6 @@
 package ca.gforcesoftware.gfsdi;
 
-import ca.gforcesoftware.gfsdi.controllers.ConstructorInjectController;
-import ca.gforcesoftware.gfsdi.controllers.MyController;
-import ca.gforcesoftware.gfsdi.controllers.PropertyInjectController;
-import ca.gforcesoftware.gfsdi.controllers.SetterInjectedController;
+import ca.gforcesoftware.gfsdi.controllers.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -92,6 +89,21 @@ public class GfsDiApplication {
 		 */
 		System.out.println("----- Primary Constructor");
 		System.out.println(myController.getGreeting());
+
+		/*
+		In this brand we are using profile.
+		1- we defined two different Services (I18nEnglishGreetingService and I18nSpanishGreetingService) to implement the GreetingService interface
+		2- In each service we added @Service ("QUALIFIER_NAME") instead of using @qualifier annotation. both qualifier name are the same in both
+		3- In each service we added a new annotation @Profile("PROFILE_NAME")
+		4- we defined a new controller I18NController and we added added the (@Qualifier("i18nService")
+		4- in resources/application.properties we defined which prifle should be active with using "spring.profiles.active=ES" we don't embrace of profile name with double quote in here
+
+		When we look as the output console , we see spring chose which profile
+		--- [gfs-di] [           main] c.gforcesoftware.gfsdi.GfsDiApplication  : The following 1 profile is active: "ES"
+		 */
+		System.out.println("----- Using ACTIVE PROFILE");
+		I18NController i18NController = ctx.getBean(I18NController.class);
+		System.out.println(i18NController.sayHello());
 
 	}
 
