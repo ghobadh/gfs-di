@@ -1,6 +1,9 @@
 package ca.gforcesoftware.gfsdi;
 
+import ca.gforcesoftware.gfsdi.controllers.ConstructorInjectController;
 import ca.gforcesoftware.gfsdi.controllers.MyController;
+import ca.gforcesoftware.gfsdi.controllers.PropertyInjectController;
+import ca.gforcesoftware.gfsdi.controllers.SetterInjectedController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -59,6 +62,28 @@ public class GfsDiApplication {
 
 		String greeting = myController.sayHello();
 		System.out.println(greeting);
+
+		/*This part of code unlike the code above , we try to use spring framework to instantiate our bean
+		* for this reason these are steps we did
+		*  1- we add @Service to the GreetingServiceImpl
+		*  2- we add @Controller to class of each controller
+		*  3- We add @Autowired (except to the ConstructorInjectController), the tell spring how to implement the interface
+		*  If we don't add these annotation Spring will not be able to start the app and work with beans
+		 */
+
+		System.out.println("----- Property");
+		PropertyInjectController propertyInjectController = ctx.getBean(PropertyInjectController.class);
+		System.out.println(propertyInjectController.getGreeting());
+
+		System.out.println("----- Setter");
+		SetterInjectedController setterInjectedController = ctx.getBean(SetterInjectedController.class);
+		System.out.println(setterInjectedController.getGreeting());
+
+		System.out.println("----- Constructor");
+		ConstructorInjectController constructorInjectController = ctx.getBean(ConstructorInjectController.class);
+		System.out.println(constructorInjectController.getGreeting());
+
+
 	}
 
 }
