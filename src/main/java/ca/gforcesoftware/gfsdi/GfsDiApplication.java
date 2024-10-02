@@ -84,6 +84,15 @@ public class GfsDiApplication {
 		System.out.println(constructorInjectController.getGreeting());
 
 
+		/* This time we use primary service (check PrimaryGreeting Service which we added @Primary to it,
+		Therefore, in MyController when we created the constructor , we did not mention @Autowired nor @Qualifier. Now
+		because of @Primary , PrimaryGreetingService will be automatically selected.
+		Please note, since we added @Primary to our service, we can even remove @Qualifier and when we do it, the controller automatically
+		will pick the default primary service from now on.
+		 */
+		System.out.println("----- Primary Constructor");
+		System.out.println(myController.getGreeting());
+
 	}
 
 }
