@@ -1,7 +1,5 @@
 package ca.gforcesoftware.gfsdi.services;
 
-import org.springframework.stereotype.Service;
-
 /**
  * @author gavinhashemi on 2024-10-01
  * As I expalied in PropertyInjectController, since we added @AutoWired , we need to tell to spring how instantiate the interface of GreetingService
@@ -10,7 +8,8 @@ import org.springframework.stereotype.Service;
  *
  *  This class is a refactor of GreetingSericeImpl
  */
-@Service
+// We remove @Service annotation because will call this through GreetingServiceConfig
+//@Service
 public class ConstractorGreetingService implements GreetingService {
 
     @Override

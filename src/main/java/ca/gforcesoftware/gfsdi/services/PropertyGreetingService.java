@@ -1,11 +1,10 @@
 package ca.gforcesoftware.gfsdi.services;
 
-import org.springframework.stereotype.Service;
-
 /**
  * @author gavinhashemi on 2024-10-02
  */
-@Service
+// We remove @Service annotation because will call this through GreetingServiceConfig
+//@Service
 public class PropertyGreetingService implements GreetingService {
 
     @Override
