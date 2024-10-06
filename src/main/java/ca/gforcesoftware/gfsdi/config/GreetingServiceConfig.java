@@ -5,23 +5,32 @@ import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepositoryImpl;
 import ca.gforcesoftware.gfsdi.services.*;
 import com.gargamel.pets.PetService;
 import com.gargamel.pets.PetServiceFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 
 /**
  * @author gavinhashemi on 2024-10-06
  */
+@ImportResource("classpath:gfsdi-config.xml")
 @Configuration
 public class GreetingServiceConfig {
 
     //In here we explicitly define this class as bean, remember @Bean is used in @Configuration annotation. In here we don't need @Service in constructorGreetingService anymore and that it why
     // we commented out over there.
-    @Bean
-    ConstractorGreetingService constractorGreetingService() {
-        return new ConstractorGreetingService();
-    }
+
+
+
+    /*
+    in this branch we removed the @Bean, because we did in the old way using XML
+    1- we created gfsdi-config.xml
+    2- we defined the bean over ther
+    3- we used @ImportResource to give the class path of the bean configuration
+    4- we commented out the @Bean in below
+     */
+
+    //@Bean
+    //ConstractorGreetingService constractorGreetingService() {
+    //    return new ConstractorGreetingService();
+    //}
 
     //we do for other service classes as well.
     @Bean
