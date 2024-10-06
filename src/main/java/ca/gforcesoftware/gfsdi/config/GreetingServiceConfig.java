@@ -3,6 +3,8 @@ package ca.gforcesoftware.gfsdi.config;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepository;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepositoryImpl;
 import ca.gforcesoftware.gfsdi.services.*;
+import com.gargamel.pets.PetService;
+import com.gargamel.pets.PetServiceFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -61,6 +63,24 @@ public class GreetingServiceConfig {
     @Bean("i18nService")
     I18nSpanishGreetingService i18nSpanishService() {
         return new I18nSpanishGreetingService();
+    }
+
+    @Profile({"dog", "default"})
+    @Bean
+    PetService dogPetService(PetServiceFactory petServiceFactory) {
+        return petServiceFactory.getPetService("dog");
+    }
+
+    @Profile({"cat"})
+    @Bean
+    PetService catPetService(PetServiceFactory petServiceFactory) {
+        return petServiceFactory.getPetService("cat");
+    }
+
+
+    @Bean
+    PetServiceFactory petServiceFactory() {
+        return new PetServiceFactory();
     }
 
 }

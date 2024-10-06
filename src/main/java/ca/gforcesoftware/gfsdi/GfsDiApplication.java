@@ -4,7 +4,6 @@ import ca.gforcesoftware.gfsdi.controllers.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 
 /*
 Because we moved all services under com.gargamel.pets packages which is NOT under ca.gforcesoftware.gfsdi , we need to use @ComponentScan to explicitly tell Spring to check all Spring Stereotype over there also. In
@@ -12,7 +11,12 @@ this way, we overwrite the default component scan
 Otherwhise, the pet controller will because due to failing find the right service
 Please note, over writing the defualt component scan, it raise the reflection and if we have heavy load application, this will slow down the application eventually
  */
-@ComponentScan(basePackages = {"ca.gforcesoftware.gfsdi", "com.gargamel.pets"})
+
+/*
+In this new changes since we used the Pet Factory to create the objects we wanted now we don't need to explicitly ask spring to scan all components in other directory.
+That is why we commented out ComponentScan in below
+ */
+//@ComponentScan(basePackages = {"ca.gforcesoftware.gfsdi", "com.gargamel.pets"})
 @SpringBootApplication
 public class GfsDiApplication {
 
