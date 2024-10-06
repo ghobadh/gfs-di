@@ -25,6 +25,7 @@ public class GreetingServiceConfig {
         return new SetterGreetingService();
     }
 
+    //we do for other service classes as well.
     @Bean
     PropertyGreetingService propertyGreetingService() {
         return new PropertyGreetingService();
