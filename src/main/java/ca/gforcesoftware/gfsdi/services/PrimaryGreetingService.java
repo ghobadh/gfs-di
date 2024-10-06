@@ -1,8 +1,5 @@
 package ca.gforcesoftware.gfsdi.services;
 
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
 /**
  * @author gavinhashemi on 2024-10-01
  * As I expalied in PropertyInjectController, since we added @AutoWired , we need to tell to spring how instantiate the interface of GreetingService
@@ -11,8 +8,10 @@ import org.springframework.stereotype.Service;
  *
  *  This class is a refactor of GreetingSericeImpl
  */
-@Service
-@Primary
+
+//We remove both @Service and @Primary in here and add this service class as bea in GreetingServiceConfigclass. OVer there, we tell spring that this is a primary service class
+//@Service
+//@Primary
 public class PrimaryGreetingService implements GreetingService {
 
     @Override

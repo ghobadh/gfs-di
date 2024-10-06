@@ -1,13 +1,13 @@
 package ca.gforcesoftware.gfsdi.services;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-
 /**
  * @author gavinhashemi on 2024-10-02
  */
-@Profile("EN")
-@Service("i18nService")
+
+//Similar to others we commented out both @Profile and @Service in here and then we add this service class in GreetingServiceConfig.
+// IMPORTANT NOTE the name of Service we have "i18Service" will be the name of method in the @Bean in GreetingServiceConfig. The @Profile in GreetingServiceConfig will be the same as here
+//@Profile("EN")
+//@Service("i18nService")
 public class I18nEnglishGreetingService implements GreetingService {
 
     @Override
