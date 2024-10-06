@@ -1,5 +1,7 @@
 package ca.gforcesoftware.gfsdi.services;
 
+import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepository;
+
 /**
  * @author gavinhashemi on 2024-10-02
  */
@@ -10,8 +12,14 @@ package ca.gforcesoftware.gfsdi.services;
 //@Service("i18nService")
 public class I18nEnglishGreetingService implements GreetingService {
 
+    private final EnglishGreetingRepository englishGreetingRepository;
+
+    public I18nEnglishGreetingService(EnglishGreetingRepository englishGreetingRepository) {
+        this.englishGreetingRepository = englishGreetingRepository;
+    }
+
     @Override
     public String sayGreeting() {
-        return "Hello Gragamel. How are you?";
+        return "Hello Gragamel. How are you? - D'oh";
     }
 }
