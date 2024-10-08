@@ -1,9 +1,30 @@
 #This is property yaml file is exactly like application.properties. Both files do exactly the same thing.
-spring.:
+spring:
   application:
     name: gfs-di
-spring:
   profiles:
-    active: cat,EN,dev
+    active:
+      - cat
+      - EN
+      - prod
+#    active: cat,EN,prod  <--- this work as well as it is a list
+
 gforce:
   username: userNamefromApplicationPropertiesYMLFile
+
+# three dash line means this is another profile all together in a single file
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+# in spring older version the profile name should be like this
+#      spring:
+#         profiles: prod
+# but this way causes of failure in spring boot to start
+gforce:
+  arg1: ProdArgument1YML
+  arg2: ProdArgument2YML
+  arg3: ProdArgument3YML
+
