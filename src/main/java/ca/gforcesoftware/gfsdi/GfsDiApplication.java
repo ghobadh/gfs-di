@@ -2,6 +2,7 @@ package ca.gforcesoftware.gfsdi;
 
 import ca.gforcesoftware.gfsdi.controllers.*;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSource;
+import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArg;
 import ca.gforcesoftware.gfsdi.services.PrototypeBean;
 import ca.gforcesoftware.gfsdi.services.SingletonBean;
 import org.springframework.boot.SpringApplication;
@@ -139,6 +140,11 @@ public class GfsDiApplication {
 		System.out.println(dummyDataSource.getUsername());
 		System.out.println(dummyDataSource.getPassword());
 		System.out.println(dummyDataSource.getJdbcURL());
+
+        DummyDataSourceArg dummyDataSourceArg = ctx.getBean(DummyDataSourceArg.class);
+        System.out.println(dummyDataSourceArg.getArgument1());
+        System.out.println(dummyDataSourceArg.getArgument2());
+        System.out.println(dummyDataSourceArg.getArgument3());
 
 	}
 

@@ -1,6 +1,7 @@
 package ca.gforcesoftware.gfsdi.config;
 
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSource;
+import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArg;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepository;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepositoryImpl;
 import ca.gforcesoftware.gfsdi.services.*;
@@ -29,7 +30,32 @@ public class GreetingServiceConfig {
         3- in this file first I add @PropertySource annotation in the class level and with classpath I put the name of source file
         4- I created a bean as below to pass all properties into the datasource object
         5- I used Spring expression "${property_name}" along with @Value annotation to pass the date to the object parameters.
+        6- If we want to use the program arguments of the application we pass like this
+            --gforce.password=passwordFromCmdLine
+        7- If we want to use Environment Arguments we add like this
+            GFORCE_USERNAME=UserNameFromEnvVar1
+
+            Note:we need to put all chars in capital so spring will pick them up as exact lower cases in the datasource.properites and/or program arguments
+        8- The file "application.properties" is a default file in Spring Boot so I don't need to add explicitly in @PropertySource annotation. Therefore, when I added gforce.username it is picked up from over there. Note that ,
+        I had to remove both command line and environment variable in order the application picks up the property from application.properties files. (check HELP.md for the property priorities)
+
+        9- Spring boot can use default properties profile files such as "application-dev.properties" or "application-qa.properties" in the resources folder. I just need to add the name of the profile in the "application.properties" like this
+                    spring.profiles.active=cat,EN,qa
+           In here we aeed the "qs" as an active profile in spring and the file "application-qa.properties" will be picked up automatically. I created another dummy data source as "dummyDataSourceArg" for this propose
+
      */
+    @Bean
+    DummyDataSourceArg dummyDataSourceArg(@Value("${gforce.arg1}") String arg1,
+                                          @Value("${gforce.arg2}") String arg2,
+                                          @Value("${gforce.arg3}") String arg3) {
+        DummyDataSourceArg dummyDataSourceArg = new DummyDataSourceArg();
+        dummyDataSourceArg.setArgument1(arg1);
+        dummyDataSourceArg.setArgument2(arg2);
+        dummyDataSourceArg.setArgument3(arg3);
+        return dummyDataSourceArg;
+    }
+
+
     @Bean
     DummyDataSource dummyDataSource(@Value("${gforce.username}") String username,
                                     @Value("${gforce.password}") String password,
