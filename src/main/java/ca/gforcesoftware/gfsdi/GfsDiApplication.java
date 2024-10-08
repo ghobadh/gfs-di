@@ -1,6 +1,7 @@
 package ca.gforcesoftware.gfsdi;
 
 import ca.gforcesoftware.gfsdi.config.GfsConfiguration;
+import ca.gforcesoftware.gfsdi.config.GfsConstructorConfiguration;
 import ca.gforcesoftware.gfsdi.controllers.*;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSource;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArg;
@@ -152,6 +153,13 @@ public class GfsDiApplication {
 		System.out.println(gfsConfiguration.getArg1());
 		System.out.println(gfsConfiguration.getArg2());
 		System.out.println(gfsConfiguration.getArg3());
+
+		System.out.println("---------------Constructor Binging proprities --------------");
+		GfsConstructorConfiguration gfsConstructorConfiguration = ctx.getBean(GfsConstructorConfiguration.class);
+		System.out.println(gfsConstructorConfiguration.getArg4());
+		System.out.println(gfsConstructorConfiguration.getArg5());
+		System.out.println(gfsConstructorConfiguration.getArg6());
+
 
 
 

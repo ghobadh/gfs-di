@@ -3,17 +3,20 @@ package ca.gforcesoftware.gfsdi.config;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSource;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArg;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArgBind;
+import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArgConstructorBind;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepository;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepositoryImpl;
 import ca.gforcesoftware.gfsdi.services.*;
 import com.gargamel.pets.PetService;
 import com.gargamel.pets.PetServiceFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
 
 /**
  * @author gavinhashemi on 2024-10-06
  */
+@EnableConfigurationProperties(GfsConstructorConfiguration.class)
 @PropertySource("classpath:datasource.properties")
 @ImportResource("classpath:gfsdi-config.xml")
 @Configuration
@@ -56,7 +59,26 @@ public class GreetingServiceConfig {
         return dummyDataSourceArg;
     }
 
+    /*
+    In this change I used a class constructor as immutable object to make sure the date in the properties will not change. These are my steps
+    1- I created a class file GfsConstuctoConfiguration file which has all parameters as final and one class constructor for it
+    2- I added @ConstructorBinding  annotation to instruct spring that this constructor for binging
+    3- I added @EnableConfigurationProperties(GfsConstructorConfiguration.class) to this file in the class level so to instruct spring that the GfsConstructorConfiguration will be used as proprety file reader
+    4- I added this bean and popluated the properties in it so when I called it in contrext file (GfsDiApplication) the object works properly
+    5- Similar to class binding no need to associate any exact property name into the method argument
+     */
+    @Bean
+    DummyDataSourceArgConstructorBind dummyDataSourceArgConstructorBind(GfsConstructorConfiguration gfsConstructorConfiguration) {
+        DummyDataSourceArgConstructorBind dummyDataSourceArgConstructorBind = new DummyDataSourceArgConstructorBind();
+        dummyDataSourceArgConstructorBind.setArgument4(gfsConstructorConfiguration.getArg4());
+        dummyDataSourceArgConstructorBind.setArgument5(gfsConstructorConfiguration.getArg5());
+        dummyDataSourceArgConstructorBind.setArgument6(gfsConstructorConfiguration.getArg6());
 
+        return dummyDataSourceArgConstructorBind;
+    }
+
+
+    //Binding arguments
     @Bean
     DummyDataSourceArgBind dummyDataSourceArgBind(GfsConfiguration gfsConfiguration) {
         DummyDataSourceArgBind dummyDataSourceArgBind = new DummyDataSourceArgBind();
@@ -80,10 +102,10 @@ public class GreetingServiceConfig {
 
     /*
     in this branch we removed the @Bean, because we did in the old way using XML
-    1- we created gfsdi-config.xml
-    2- we defined the bean over ther
-    3- we used @ImportResource to give the class path of the bean configuration
-    4- we commented out the @Bean in below
+    1- I created gfsdi-config.xml
+    2- I defined the bean over ther
+    3- I used @ImportResource to give the class path of the bean configuration
+    4- I commented out the @Bean in below
      */
 
     //@Bean

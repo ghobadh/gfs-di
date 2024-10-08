@@ -7,6 +7,7 @@ spring:
       - cat
       - EN
       - prod
+      - test
 #    active: cat,EN,prod  <--- this work as well as it is a list
 
 gforce:
