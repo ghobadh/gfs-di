@@ -35,4 +35,27 @@ Spring has 14 'Aware' interfaces. These are can be useful when you want to modif
 * No declaration needed for singleton scope
 * in Java Configuration use @Scope annotation
 * in XML configuration scope in an xml attribute of the bean tag
-* 99% of the time singlton scope is fine
+* 99% of the time singleton scope is fine
+
+### Setting External Properties
+
+* Command Line Arguments
+* SPRING_APPLICATION_JSON
+* JNDI
+* OS Environment variables
+* Property files / YAML (most comnon)
+
+#### Property Hierarchy
+
+- Review Section 24 - Externalized Configuration of Spring Boot
+- Properties can be overridden depending on how they are defined
+- Lowest are properties defined in JAR/WAR properties or YAML files
+- NExt are external properties files to JAR via file system
+- Higher are profile specific properties files (in jar then external)
+- OS Environment Variables
+- Java System properties
+- JNDI
+- SPRING_APPLICATION_JSON
+- Command line argument
+- Test Properties (for testing)
+
