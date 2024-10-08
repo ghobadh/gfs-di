@@ -1,0 +1,9 @@
+#This is property yaml file is exactly like application.properties. Both files do exactly the same thing.
+spring.:
+  application:
+    name: gfs-di
+spring:
+  profiles:
+    active: cat,EN,dev
+gforce:
+  username: userNamefromApplicationPropertiesYMLFile
