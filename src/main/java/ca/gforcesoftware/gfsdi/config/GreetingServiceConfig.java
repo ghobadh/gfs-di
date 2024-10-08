@@ -2,6 +2,7 @@ package ca.gforcesoftware.gfsdi.config;
 
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSource;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArg;
+import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArgBind;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepository;
 import ca.gforcesoftware.gfsdi.repositories.EnglishGreetingRepositoryImpl;
 import ca.gforcesoftware.gfsdi.services.*;
@@ -53,6 +54,16 @@ public class GreetingServiceConfig {
         dummyDataSourceArg.setArgument2(arg2);
         dummyDataSourceArg.setArgument3(arg3);
         return dummyDataSourceArg;
+    }
+
+
+    @Bean
+    DummyDataSourceArgBind dummyDataSourceArgBind(GfsConfiguration gfsConfiguration) {
+        DummyDataSourceArgBind dummyDataSourceArgBind = new DummyDataSourceArgBind();
+        dummyDataSourceArgBind.setArgument1(gfsConfiguration.getArg1());
+        dummyDataSourceArgBind.setArgument2(gfsConfiguration.getArg2());
+        dummyDataSourceArgBind.setArgument3(gfsConfiguration.getArg3());
+        return dummyDataSourceArgBind;
     }
 
 

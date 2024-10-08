@@ -1,5 +1,6 @@
 package ca.gforcesoftware.gfsdi;
 
+import ca.gforcesoftware.gfsdi.config.GfsConfiguration;
 import ca.gforcesoftware.gfsdi.controllers.*;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSource;
 import ca.gforcesoftware.gfsdi.datasource.DummyDataSourceArg;
@@ -145,6 +146,14 @@ public class GfsDiApplication {
         System.out.println(dummyDataSourceArg.getArgument1());
         System.out.println(dummyDataSourceArg.getArgument2());
         System.out.println(dummyDataSourceArg.getArgument3());
+
+		System.out.println("-----------Binging proprities -------------");
+		GfsConfiguration gfsConfiguration = ctx.getBean(GfsConfiguration.class);
+		System.out.println(gfsConfiguration.getArg1());
+		System.out.println(gfsConfiguration.getArg2());
+		System.out.println(gfsConfiguration.getArg3());
+
+
 
 	}
 
