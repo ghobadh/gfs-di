@@ -59,3 +59,38 @@ Spring has 14 'Aware' interfaces. These are can be useful when you want to modif
 - Command line argument
 - Test Properties (for testing)
 
+## JPA
+
+- Hibernate 5 is complying with JPA 2.1
+
+### JPA Cascade Type
+
+By default, no operation are cascaded.
+
+* PERSIST: Save operations will cascade to related entities
+* MERGE: related entities are merged when the owning entity is merged
+* REFRESH: related entities are refreshed when the owning entity is refreshed
+* REMOVED: removes all related entities when the owning entity is deleted
+* DETACH: detaches all related entities if a manual detach occurs
+* ALL: Applies all the above cascade options
+
+### Embeddable Type
+
+* JPA/Hibernate do support an embeddable tpes and this is basically a POJO
+* There are used to define a common set of propertie. e.g. an order might have a billing address and a shipping address
+* An embeddable type could be used for the address properties.
+
+#### Inheritance
+
+Hibernate supports inheritance by using 'MappedSuperClass' . A database table is NOT created for the super class.
+
+* Single Table: (Hibernate Default) - One table is used for all subclasses
+* Joined Tables: Based class and subclasses have their own tables. Fetching subclass entities require a join to the
+  parent table
+* Table Per Class: Each subclass has its own table
+
+#### Create and update Timpestamp
+
+* Often a best practice to use create and update timestamps on your entities for audit proposes
+* JPA supports @PrePersist and @PreUpdate which can be used to support audit timestamps via JPA lifecycle callbacks
+* Hibernate provides @CreationTimestamp and @UpdateTimestamp (This is hibernate specific)
