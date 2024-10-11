@@ -99,6 +99,7 @@ Hibernate supports inheritance by using 'MappedSuperClass' . A database table is
 
 * DDL = Data Definition Language
 * DML = Data Manipulation Language
+* Camel naming will be changed with "_" . for example : UnitOfMeasure --> unit_of_measure
 * Hibernate property in Spring is --> spring.jpa.hibernate.ddl-auto
 * Option are none, validate, update, create, create-drop
 * Default option for embedded db such as hsql, h2, derby is create-drop , otherwise, it will be 'none' as default.
