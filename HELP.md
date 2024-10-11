@@ -105,6 +105,7 @@ Hibernate supports inheritance by using 'MappedSuperClass' . A database table is
 * Data can be loaded from import.sql
   * This is hibernate not Spring feature
   * Must be on root of the class path
+  * You may NEED to add spring.jpa.defer-datasource-initialization=true property into application.properties
 * Only executed if hibernate's ddl-auto property is set to create or create-drop
 
 #### Spring JDBC
