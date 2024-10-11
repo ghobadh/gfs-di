@@ -94,3 +94,24 @@ Hibernate supports inheritance by using 'MappedSuperClass' . A database table is
 * Often a best practice to use create and update timestamps on your entities for audit proposes
 * JPA supports @PrePersist and @PreUpdate which can be used to support audit timestamps via JPA lifecycle callbacks
 * Hibernate provides @CreationTimestamp and @UpdateTimestamp (This is hibernate specific)
+
+#### Hibernate DDL Auto
+
+* DDL = Data Definition Language
+* DML = Data Manipulation Language
+* Hibernate property in Spring is --> spring.jpa.hibernate.ddl-auto
+* Option are none, validate, update, create, create-drop
+* Default option for embedded db such as hsql, h2, derby is create-drop , otherwise, it will be 'none' as default.
+* Data can be loaded from import.sql
+  * This is hibernate not Spring feature
+  * Must be on root of the class path
+* Only executed if hibernate's ddl-auto property is set to create or create-drop
+
+#### Spring JDBC
+
+* Spring's DataSource initializer via Spring Boot will be default load schema.sql and data.sql from the root of the
+  classpath
+* Spring Boot will also load from scheam-${platform}.sql and data-${platfor}.sql
+  * Must set spring.datasource.platform property
+* May conflict with Hibernate's DDL Auto property
+  * Should use setting of 'none' or 'validate' 
