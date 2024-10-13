@@ -117,3 +117,77 @@ Hibernate supports inheritance by using 'MappedSuperClass' . A database table is
   * Must set spring.datasource.platform property
 * May conflict with Hibernate's DDL Auto property
   * Should use setting of 'none' or 'validate' 
+
+# Testing In Spring
+
+Pleas check 'RecetteProject' for different test style .
+Also, in 'Gargamel Pet Clinic' you can fine the upgrading JUnit5
+
+## Testing Terminology
+
+* TDD - Test Driven Development - write test first, which will fail , then code to 'fix' test
+* BDD - Behaviour Driven Development - Builds on TDD and specifies that tests of any unit of software should be
+  specified in term of desired behaviour of the unit
+* Mock - A face implementation of a class used for testing. Like a test double
+* Spy - A partial mock, allowing you to override select methods of a real class
+
+## Test Scope Dependencies
+
+Using spring-boot-starter-test (default from Spring Initalizr will load the following dependenciese)
+
+* JUnit - De-facto standard for unit testing java application
+* Spring Test and Spring Boot Test - utilities and integration test support for Spring Boot applications
+* AssertJ - A fluent assertion of matcher objects
+* Hamcrest- A library fo matcher objects
+* Mockito - A Java mocking framework
+* JSONassert - An assertion library for JSON
+* JSONPath - XPath for JSON
+
+## JUnit 4 Annotation
+
+| Annotation                            | Description                                                                                                                              |
+|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| @Test                                 | Identiies a method as a test method                                                                                                      |
+| @Before                               | Executed before each test. It is used to prepare  the test environment (e.g. read inputdata, initialize the class)                       |
+| @After                                | Extecuted after each test. It is used to cleanup the test environment. It can also save memory by cleaning up expensive memory structure |
+| @BeforeClass                          | Executed once, before the start of all tests. Methods marked with this annotation need to be defined as static to work with JUnit        |
+| @AfterClass                           | Executed once, after all tests have been finished. Methos annotated with this annotation need to be defined as static to work with JUnit |
+| @Ignore                               | Marchs that the test should be disabled                                                                                                  |
+| @Test(expected =<br/> Exception.class | Fails if the method does not throw the named exception                                                                                   |
+| @Test(timeout = 10)                   | Fails if the method takes longer than 10 milliseconds                                                                                    |
+
+## Spring Boot Annotations
+
+| Annotation                   | Description                                                             |
+|------------------------------|-------------------------------------------------------------------------|
+| @RunWith(SpringRunner.class) | Run test with Spring context                                            |
+| @SpringBootTest              | Search for Spring Boot Application for configuration                    |
+| @TestConfiguration           | Specify a Spring configuration for your test                            |
+| @MockBean                    | Inject Mockito Mock                                                     |
+| @SpyBean                     | Inject Mockito Spy                                                      |
+| @JsonTest                    | Create a Jackson or Gson object mapper via Spring Boot                  |
+| @WebMvcTest                  | Used to test web context w/o a full http server                         |
+| @DataJpaTest                 | Used to test data layer with embedded database                          |
+| @JdbcTest                    | Like @DataJpaTest, but does not configure entity manager                |
+| @DataMongoTest               | Configures an embedded MongoDB for testing                              |
+| @RestClientTest              | Creates a mock server for testing rest clients                          |
+| @AutoConfigureRestDocks      | Allows you to use Spring Rest Docs in tests, creating API Documentation |
+| @BootStrapWith               | Used to configure how the TestContext is bootstrapped                   |
+| @ConextConfiguration         | Used to direct Spring how to configure the context for the test         |
+| @ContextHierarchy            | Allows you to create a context hierarchy with @ConextConfiguration      |
+| @ActiveProfile               | Set which Spring Profiles are active for the test                       |
+
+## JUnit 5
+
+| JUnit4       | Junit5      |
+|--------------|-------------|
+| @Before      | @BeforeEach |
+| @After       | @AfterEach  |
+| @BeforeClass | @BeforeAll  |
+| @AfterClass  | @AfterAll   |
+| @Ignore      | @Disabled   |
+| @Catgory     | @Tag        |
+
+Please note still you can run Junit 4 or 3 in Junit 5.
+Junit 5 needs Java 8 or higher
+
