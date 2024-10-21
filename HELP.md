@@ -254,3 +254,49 @@ Junit 5 needs Java 8 or higher
       * if just setting the HTTP status - use @ResponseStatus
       * if redirection to a view , use SimpleMappingExceptionResolver
       * if both , consider @ExceptionHandler on the controller
+
+## Data Validation with JSR-303
+
+### Built in contraint definitions
+
+* @Null - check value is null
+* @NotNull - check values is not null
+* @AssertTrue - value is true
+* @AssertFalse - value is false
+* @Min - Number is equal or higher
+* @Max - Number is equal or less
+* @DecimalMin - value is larger
+* @DecimalMax - value is less than
+* @Negative - values is less than zero - zero invalid
+* @NegativeOrZero - values is less than zero or zero
+* @Positvie - value is greater than zero , zero is invalid
+* @PositiveOrZero - value is greater than zero or zero
+* @Size - checks if string or collection is between a min and max
+* @Digits - checks for integer digits and fraction digits
+* @Past - checks if date is in past
+* @PastOrPresent - checks if date is past or present
+* @Future - checks if date is in future
+* @FutureOrPresent - checks if date is present or in future
+* @Pattern - checks against RegEx pattern
+* @NotEmpty - checks if value is not null nor empty (whitespace chars or empty collections)
+* @NonBlank - checks string is not null nor whitespace character
+* @Email - checks if the string value is an email address
+
+### Hibernate validation constraints ( These specific for Hibernate and not bean validation)
+
+* @ScriptAssert - class level annotation , check class against script
+* @CreditCardNumber - verifies value is a credit card number
+* @Currency - value currency amount
+* @DurationMax - Duration less than given value
+* @DurationMin - Duration greater than give value
+* @EAN - Valud EAN Barcode
+* @ISBN - valud ISBN Value
+* @Length - String length b/w given min and max
+* @CodePointLength - validates that code point length of the annotated char sequence is b/w min and max included
+* @LuhnCheck - Luhn check sum
+* @Mod10Check - Mod 10 check sum
+* @Mod11Check - Mod 11 check sum
+* @Range - check if number is b/w given min and max ( inclusive)
+* @SafeHtml - check for safe HTML
+* @UniqueElements - checks if collection has unique elements
+* @Url - check for valid URL
