@@ -201,3 +201,56 @@ Junit 5 needs Java 8 or higher
   * 'address.addressLine1' would bind to the addressLine1one of the address property of the PersonBean
   * email[0]/email[1] would bind to index zero and one of the email ist of Set property of Person
 
+# Handling Exception in Spring framework
+
+## HTTP Status Codes
+
+* HTTP 5XX Server Error (e.g. HTTP 500 is Internal Server Error)
+* Other 500 errors are generally not used with Spring MVC
+* HTTP 4XX Client errors - Generally Checked exception
+  * 400 Bad Request - cannot process due to client error
+  * 401 Unauthorized - Authentication required
+  * 404 Not found - Resource not found
+  * 405 Method not allowed - HTTP method not allowed
+  * 409 - conflict - Possible with simultaneous updates
+  * 417 Expectation failed - Sometimes used with RESTful interfaces
+  * 418 - I'm a teapot - April fools joke from IETS in 1998
+
+## Spring for exception handling
+
+* @ResponseStatus - Allow you to annotate custom exception classes to indicate to the framework the HTTP status you want
+  retured when that exception is throw. It is 'global' to the application
+* @ExceptionHandler - it works at the controller level and it allows you to define custom exception handling:
+  * can be used with @ResponseStatus for just returning a http status
+  * can be used to return a specific view
+  * also can take total control and work with the model and view
+    * 'Model' cannot be a parameter of an ExceptionHandler method
+* HandlerExceptionResolver - it is an interface you can implement for custom exception handling
+  * Used internally by Spring MVC
+  * Note 'Model' is not passed
+    * Example:
+      public interface HandlerExceptionResolver {
+      @Nullable
+      ModelAndView resolveException( HttpServletRequest request,
+      HttpServletResponse response, @Nullable Object handler, Exception ex );
+      }
+* Internal Spring MVC Exception Handlers
+  * Spring MVC has 3 implementations of HandlerExceptionResolver
+    * ExceptionHandlerExceptionResolver - matches uncaught exceptions to @ExceptionHandler
+    * ResponseStatusExceptionResolver - looks for uncaught exceptions matching @ResponseStatus
+    * DefaultHandlerExceptionResolver - Convert standard Spring Exception to HTTP status codes ( Internal to Spring MVC)
+* Custom HandlerExceptionResolver
+  * You can provide your own implementations of HandlerExceptionResolver
+  * Typically implemented with Spring's Ordered Interface to define order the handlers with run in
+  * Custom implementations are uncommon due to Spring robust exception handling
+* SimplMappingExceptionResolver
+  * A Spring Bean you can define to map exceptions to specific views
+  * You only define the exception class name ( no package ) and the view name
+  * You can optionally define a default error page
+
+### Which to use them
+
+    * Depends on your specific needs
+      * if just setting the HTTP status - use @ResponseStatus
+      * if redirection to a view , use SimpleMappingExceptionResolver
+      * if both , consider @ExceptionHandler on the controller
