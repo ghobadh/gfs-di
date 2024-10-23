@@ -300,3 +300,33 @@ Junit 5 needs Java 8 or higher
 * @SafeHtml - check for safe HTML
 * @UniqueElements - checks if collection has unique elements
 * @Url - check for valid URL
+
+## Internationalization
+
+### Local Detection
+
+* Default behaviour is to use Accept-language header
+* Can be configured to use system, a cookie, or a custom parameter
+* Custom Parameters is useful to allow user to select language
+
+### Local Resolver
+
+* AcceptHeaderLocalResolver is the Spring Boot Default
+* Optionally can use FixedLocaleResolver ( uses the locale of the JVM)
+* Available: CookieLocaleResolver, SessionLocaleResolver ( Not used much)
+
+### Changing Locale
+
+* Browsers are typically tied to the Locale of the OS
+* Locale changing plugins are available
+* Spring MVC provides as
+  * LocaleChangeIntercepter to allow you to configure a custom parameter to use to change the locale.
+
+### Resource Bundles
+
+* Resource bundles (aks messages.properties) are selected on highest match order.
+* First selected wil be on language region (ie: en-US would match messages_en_US.properties)
+* If no exact match is found, just the language code is used
+* en-GB would match message_en.properties
+* OR if no file found, would match messages_en.properties
+* Finally would match messages.properties
