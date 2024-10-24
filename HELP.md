@@ -330,3 +330,41 @@ Junit 5 needs Java 8 or higher
 * en-GB would match message_en.properties
 * OR if no file found, would match messages_en.properties
 * Finally would match messages.properties
+
+****
+
+# Docker
+
+### What is it?
+
+* Docker is a standard for Linux containers. In other words, it is an engine that enables any payload to be encapsulated
+  as a
+  lightweight, portable, self-sufficient container that can be manipulated using standard operations and run
+  consistently on virtually
+  any hardware platform.
+* A "Container" is an isolated runtime inside of Linux
+* A "Container" provides a private machine like space under Linux
+* Containers will run under any modern Linux Kernel
+
+### Container can:
+
+* Have their own process space
+* Their own network interface
+* 'Run' processes as root (inside of container)
+* Have their own disk space (can share with host too)
+* Container is NOT a VM (VM is using Hypervisor)
+
+### Docker terminology
+
+* Docker Image: ``` The representation of a Docker Constainer. Kind of like a JAR or WAR file in Java```
+* Docker
+  Container: ``` The standard runtime of Docker. Effectively a deployed and running Docker Image. Like a Spring Boot Executable JAR```
+* Docker Engine: ``` The code which managees Docker stuff. Creates and runs Docker Containers```
+* Docker Engin Runtime
+
+![dockerEngine.png](dockerEngine.png)
+
+
+
+
+
