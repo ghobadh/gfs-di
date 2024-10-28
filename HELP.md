@@ -364,7 +364,203 @@ Junit 5 needs Java 8 or higher
 
 ![dockerEngine.png](dockerEngine.png)
 
+### Docker Editions
 
+For learning more
+check [https://www.geeksforgeeks.org/docker-community-edition-vs-enterprise-edition/](https://www.geeksforgeeks.org/docker-community-edition-vs-enterprise-edition/)
 
+#### Docker Enterprise
 
+* CaaS (Container as a Service) platfor subscription
+* Enterprise class support
+* Quarterly Releases
+* Backported patches for one year
+* Certified Infrastructure
+
+#### Docker Community
+
+* Free Docker edition for developers and operations
+* Monthly 'edge' release with the latest features for developers
+* Quarterly releases for operations
+
+#### Why two Docker Editions
+
+* Docker has enjoyed explosive growth over the last several years
+* The EE allows Docker of offer certified software and enterprise support
+* This is important to companies with mission critical application
+* It is important for regulatory compliance (PCI, SOX, SAS-70...)
+
+#### Which Edition for Java Developer
+
+* Functionally, the two editions are the same (Like CentOS vs Red Hat Enterprise Linux)
+* Generally, Java developers should be fine using the Docker Community Edition
+* Docker EE is not available on some commercial OS such as RHEL or SUSE
+
+#### What is Docker Hub
+
+* Docker hub is a public Docker Registry. It has a lots of images , so I can download them, when it is needed.
+* Its address is [https://hub.docker.com](https://hub.docker.com)
+* To download any image, I need to run in this way (This example is for MySql)
+  ``` sudo docker pull mysql ```
+* example of running mongo with exposed port ``` docker run --name my_mongo2 -p 27017:27017 -d mongo``` . In this
+  example -p is exposing the tcp port
+* another example is for
+  mysql ``` sudo docker run --name mysql -v /usr/mysql_temp:/var/lib/mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -p 3306:3306 -d mysql:latest  ``` .
+  for my own project I can
+  run `` sudo  docker run -p 8081:8080 -d recette ``
+* for stop the docker
+  * run 'docker ps' to find out the container ID name
+  * run 'docker stop [container_id_name]'
+* for checking the log for any container
+
+``` 
+docker ps 
+docker logs [container_id]
+ ```
+
+* To build an image using Docker file run: ``` docker build . -t <tag_nmae>``` . An
+  example ` sudo docker build . -t recette -f recette.dockerfile `
+* I can copy the file like ` scp -P 222 ./RecetteProjet-0.0.1-SNAPSHOT.jar USERNAME@192.168.XXX.XXX:/usr/docker/.  `
+* In order to have a shell environment for the docker use ``` docker exec -it <container_name> bash```
+* In order to use a volume in command line for docker ``` docker run -v <host_path>:<the_container_path> <image_name>```
+* Sample of dockerfile (recette.dockerfile)
+
+``` 
+FROM openjdk:17-alpine
+
+ADD RecetteProjet*.jar recette.jar
+CMD java -jar recette.jar
+```
+
+#### What is a Docker Image
+
+* An image defines a Docker Container (Similar in concept to a snapshot of a VM or a class vs an instance of the class)
+* Images are immutable. That means, once built, the files making up an image do not change
+* Image are built in layers
+* Each layer is an immutable file, but is a collection of files and directories
+* Layers receive an ID, calculated via a SHA 256 hash of the layer contents
+* Thus, if the layer contents change, the SHA 256 hash changes also.
+
+### Image IDs
+
+* image ids are a SHA 256 hash derived from the layers. Thus if the layers of the image changes, the SHA 256 hash
+  changes
+* The image ID listed by docker command (ie: docker images / docker images -q --no-trunc) is the first 12 characters of
+  the hash
+
+#### Image Tag names
+
+* I can use image tag name
+* the values of images are referred to by 'tag' names (this concept is very confusing at first)
+* the format of the full tag name is ```[REGISTRYHOST/][USERNAME/]NAME:TAG```
+  * REGISTERYHOST : registry.hub.docker.com
+  * TAG: 'latest' is default
+  * e.g registry.hub.docker.com/mongo:latest
+
+#### How to use resistant storage
+
+* when I want to run the docker I can use '-v [PATH]' (-v is for volume) to specify where docker can put the storage
+  file there.
+* example :
+
+```
+docker run --name my_mongo -v /user/temp:/data/db -d mongo:tag
+```
+
+In this example with add ':' , I change the path of real path to the one I want to give to mongo to used it. which
+means, mongo understand the path as /data/db
+
+### Docker House Cleaning
+
+* There are three key areas of house keeping
+  * Containers
+  * images
+  * volumes
+
+#### Docker commands for house cleaning containers
+
+* Kill all running docker containers
+  ``` docker kill $(docker ps -q) ```
+* Delete all Stopped Docker containers ```
+  docker rm $(docker ps -a -q) ```
+* Remove a dokcer image ```
+  docker rmi \<image name\> ```
+* delete untagged (dangling) images ```
+  docker rmi $(docker images -q -f dangling=true) ```
+* Delete all images ```
+  docker rmi $(docker images -q) ```
+
+#### Docker commands for house cleaning volumes
+
+* One a volume is no longer associated with a container it is considered as 'dangling'
+* Remove all dangling volumes ```
+  docker volume rm $(docker volume ls -f dangling=true -q)
+  Note: This command does not remove files from host system in shared volumes ```
+* Cheat
+  sheet [docker-cheat-sheet-for-spring-devlopers](https://springframework.guru/docker-cheat-sheet-for-spring-devlopers/)
+
+### Running Spring in Docker
+
+* to run command ``` sudo docker run -v /usr/tmp:/usr/share/misc -d openjdk:17-alpine tail -f /dev/null``` to keep the
+  centos up and running
+* note that running command ` sudo docker ps` will not show the centos container in the list
+* now if you run `sudo docker exec -it <image_name> sh` you can inside of alpine with java 17 and run any application
+  you want.
+* for example I can run `java -version`
+
+# MySQL
+
+* It is RMDB database which has ACID compliance
+  * A: Atomicity - all or nothing
+  * C: Consistency - transactions are valid to rules of the DB
+  * I: Isolation - Result of transactions are as if they are done end to end
+  * D: Durability - Once a transaction is commited, it remain so
+
+## DataType
+
+MySql does not support standard ANSI SQL for data type
+Data Type categories in MySQL:
+
+* Numeric Data Types
+  * INTEGER/INT (4b)
+  * TINYINT (1b)
+  * SMALLINT (2b)
+  * MEDIUMINT (3b)
+  * BIGINT (8b)
+  * FLOAT (4b)
+  * DOUBLE (8b)
+  * DECIMAL/NUMERIC (Length + 1 or 2 bytes)
+* Date and Time Data Types
+  * DATE (3b)
+  * DATETIME (8b)
+  * TIMESTAMP (4b)
+  * TIME (3b)
+  * YEAR (1b)
+* String Data Types
+  * CHAR - Length (0 - 255 bytes) - (DB will pad spaces to the end of the string)
+  * VARCHAR - Length +1 - variable string
+  * BINARY - Length - Similar to CHAR
+  * VARBINARY - Length +1
+  * BLOB - Length + 2 to 4 bytes
+  * TEXT - Length + 2
+  * ENUM (1-2 bytes)
+  * SET (1-8 bytes)
+* Spatial Data Types
+* JSON Data Types (JavaScript Object Notation)
+  * This is complex, structured document containing properties and values
+  * Storage for JSON data types is similar to BLOB and TEXT data types.
+  * MySQL converts the JSON to an internal format for optimized storage and searching
+  * MySQL support searching of JSON document properties
+  * MySQL allows you to update portions of a JSON document(no replace needed)
+
+## Types of connections
+
+* Local Connection - This is when you are using command line on the machine running MySQL
+* Remote/Client Connection - You are using some type of client software on the same machine
+  OR connect to the MySQL Server from different machine over the network
+  Client Protocol
+  * TCP/IP - Most common
+  * Socket (Unix/OSX/Linux)
+  * PIPE (Windows Only)
+  * MEMORY (Windows Only)
 
