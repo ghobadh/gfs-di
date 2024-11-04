@@ -715,5 +715,59 @@ Data Type categories in MySQL:
 | POST    | Always create new object(Insert) | No                 | No            | No         |
 | DELETE  | to delete an object in resource  | No                 | No            | Yes        |
 
+## Richardson Maturity Model (RMM)
 
+* A model used to describe the maturity of RESTful services
+* Unlike SOAP there is no formal specification for REST
+* RMM is used to describe the quality of the RESTful service
+
+### RMM Levels
+
+```
+| Level 3: Hybermedia Control  |
+| Level 2: HTTP Verbs          |
+| Level 1: Resources           |
+| Level 0: The swap of POX     |
+```
+
+#### Level 0 - Swamp of POX
+
+* POX - Plain Old XML
+* uses implementation protocol as a transport protocol
+* typically uses one URI and one kind of method
+* Examples RPC, SOAP, XML-RPC
+
+#### Level 1- Resources
+
+* Uses multiple URIs to identify specific resources
+* Still uses a single method (e.g GET)
+* Example:
+  * http://www.gforcesofteare.ca/product/1234
+
+#### Level 2 - HTTP Verbs
+
+* HTTP Verbs are used with URIs for desired actions
+* Most common in practical use
+* Example:
+  * GET /products/1234 - to return data for product 1234
+  * PUT /products/1234 - to update data for product 1234
+  * DELETE /product/1234 - to delete product 1234
+
+#### Level 3- Hypermedia Control
+
+* Representation now contains URIs which may be useful to consumers (self documenting)
+* Helps client developers expolore the resource
+* No clear standard at this time
+* Spring provides an implementation of HATEOAS
+
+| **Core Technolog** |
+|--------------------|
+| HYPERMEDIA         |
+| HTTP               |
+| URI                |
+
+#### Data Model
+
+* Spring by default use Jackson to bind JSON to Java POJOs
+* 
 
