@@ -510,11 +510,20 @@ means, mongo understand the path as /data/db
 
 # MySQL
 
-* It is RMDB database which has ACID compliance
+* It is RDBMS database which has ACID compliance
   * A: Atomicity - all or nothing
   * C: Consistency - transactions are valid to rules of the DB
   * I: Isolation - Result of transactions are as if they are done end to end
   * D: Durability - Once a transaction is commited, it remain so
+
+## Features
+
+* Stored Procedure
+* Triggers
+* Cursors
+* Updatable views
+* Query Caching
+* Subselects
 
 ## DataType
 
@@ -563,4 +572,148 @@ Data Type categories in MySQL:
   * Socket (Unix/OSX/Linux)
   * PIPE (Windows Only)
   * MEMORY (Windows Only)
+
+# MongoDB
+
+* MongoDB is a document oriented database
+* It is a NOSQL database written with C++
+* MongoDB documents are storted in BSON (Binary JSON)
+
+#### Why to use MongoDB
+
+* MongoDB is greate for high insert systems (sensor reading, social media, advertising systems)
+* Good when you need schema flexibility
+* It can also support a high number of reads pe second
+
+#### Why not to use MongoDB
+
+* MongoDB has no concept of transactions
+  * No ACID
+  * No locking for transactional support, hence faster inserts
+* Not good for concurrent updates
+* if you have RDMS and want to change to NoSQL, no bi-directional relationship works anymore.
+
+### MongoDB Terminology
+
+| RDMS        | MongoDB              |
+|-------------|----------------------|
+| Database    | Database             |
+| Table       | Collection           |
+| Row         | Document             |
+| Column      | Field                |
+| Table Join  | Embedded Documents   |
+| Primary Key | Primary Key          |
+| Aggregation | Aggregation Pipeline |
+
+# Spring Reactive Programming
+
+* [www.reactivemanifesto.org](www.reactivemanifesto.org)
+* Reactive System from architecture and design (cloud Native)
+* Reactive Programming is generally event based
+* Functional Reactive programming (FRP) often confused with Reactive Programming
+
+## Reactive Manifesto
+
+* Responsive
+* Elastic
+* Resilient
+* Message Driven
+
+## Reactive Programming w/ Reactive Systems
+
+* Reactive Programming is a useful implementation technique
+* Reactive Programming focuses on non-blocking, asynchronous execution - a key characteristic of Reactive Systems
+* Reactive Programming is just one tool in building Reactive Systems
+
+## What is Reactive Programming
+
+* It is an asynchronous programming paradigm focused on streams of data
+* Reactive Programming focuses on processing streams of data
+* Traditional CRUD applications are still alive and well
+* it also maintain a continous interaction with their environment , but at a speed which is determined by the
+  environment, not the program itself.
+* it is interactive programs work at their own pace and mostly deal with communication, while reactive programing only
+  work in response to external demands and mostly deal with accurate interrupt handling.
+* SpringMVC (@Controller / @RequestMapping) and Spring WebFlux(Router Functions) are completely two different component
+  in Spring framework
+* Real-time programs are usually are reactive
+* Common use cases
+  * external service calls
+  * high concurrent message consumers
+  * spreadsheets
+  * abstraction over asynchronous processing
+
+### Features of Reactive Programming
+
+* Data Streams
+  * It can be just about anything
+  * mouse click or other user interactions
+  * JMS messages , RESTful Services calls, Twitter feed, Stock Trades, List of data from a database
+  * A Stream is a squence of events ordered in time
+  * Event you want to listen to
+* Asynchronous
+  * Events are captured asynchronously
+  * A function is defined to execute when an event is emitted
+  * Another function is defined if an error is emitted
+  * Another function is defined when complete is emitted
+* Non-blocking
+  * It is similar to GoF Observer Pattern
+  * It is an important feature (act similar to Node.js)
+  * In Blocking, the code will stop and wait for more data (ie reading from disk , network, ...)
+  * Non-Blocking in contrast, will process available data, ask to be notified when more is available, then continue
+* Backpressure
+  * The ability of the subscriber to throttle data
+* Failures as Messages
+  * Exceptions are not thrown in a traditional sense(would break processing of stream)
+  * Exceptions are processed by a handler function
+
+### Spring Reactive Types
+
+* Two new reactive types are introduced with Spring Framework 5
+* 'Mono' is a publisher with zero or one elements in data stream
+* 'Flux' is a publisher with zero or MANY elements in the data stream
+* Both types implement the Reactive Streams Publisher interface
+
+#RESTful Services
+
+## RESTful Web Services
+
+* Because of their simplicity and versatility, RESTful web serves have become the de facto standard for web services
+* REST - Representational State Transfer
+  * Representational -- Typical JSON or XML
+  * State Transfer - Typical via HTTP
+
+## RESTful Terminology
+
+* Verbs: HTTP Methods : GET, POST, DELETE, PUT
+* Messages: the payload of the action (JSON/XML)
+* URI: Uniform Resource Identifier (A unique string identifying a resource)
+* URL: Uniform Resource Locator (A URI with network information e.g. http://www.gforcesoftware.ca)
+* Idempotence:
+  * Wikipedia: Idempotence is the property of certain operations in mathematics and computer science that they can be
+    applied multiple times w/o changing the result beyond the initial application
+  * In other words, you can exercise the operation multiple times, without changing the result
+  * Example: Refreshing a web page (HTTP GET operation)
+* Stateless - Service does not maintain any client state
+* HATEOAS: Hypermedia AS The Engine Of Applications State
+  * Wikipedia: a REST client should then be able to use server-provided links dynamically to discover all the available
+    actions and resources it needs.
+    . As access proceeds, the server responds with test that includes hyperlinks to other actions that are currently
+    available.
+
+### HTTP GET
+
+* use: to read data from resource
+* read only
+* idempotent
+* state operation - does not change state of resource
+
+| Methode | USE                              | Safe<br/>Operation | Read<br/>Only | Idempotent |
+|---------|----------------------------------|--------------------|---------------|------------|
+| GET     | read data from resource          | Yes                | Yes           | Yes        |
+| PUT     | to insert or update              | No                 | No            | Yes        |
+| POST    | Always create new object(Insert) | No                 | No            | No         |
+| DELETE  | to delete an object in resource  | No                 | No            | Yes        |
+
+
 
