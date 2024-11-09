@@ -1,4 +1,102 @@
-# Spring Bean Lifecycle
+## Spring Annotations
+
+* **@Controller**: We use @Controller annotation to make a java class as a Spring MVC contoller
+* **@ResponseBody**:  The @ResponseBody annotation tells a controller that the object returned is automatically
+  serialized into JSON and passed back into the HttpResponse Object
+* **@RestController**: The @RestController is combination of @Controller and @ResponseBody
+* **@PathVariable**: This used to handle when then client sends a request to server. In other words, it used on a method
+  arugment to bind
+  it to the value of a URI template variable
+* **@RequestParam**: This is useful when we try to send a query to server
+* **@RequestBody**: The @RequestBody annotation is responsible for retrieving the HTTP request body (JSON) and
+  automatically
+  converting it to the java object. This is used when we are using post method to create an object, whereas
+  @Pathvariable is only retrieving a part of an object
+* **@ResponseStatus**: This is give the header of HTTP status. For example @ResponseStatus(HttpStatus.Created) is giving
+  HPPT 201 and
+  @ResponseStatus(HttpStatus.Bad_Gateway) gives HTTP 502.
+* **@RequestMapping**: This annotation is used in the class level to put the 'Base URI' for the controller
+* **@Entity**: @Entity annotation specifies that the class is an entity
+* **@PostMapping**: This annotation is used to map HTTP POST request onto specific handler method
+
+### ResponseEntity
+
+* ResponeEntity represents the whole HTTP response: status code, hearder, and body. As a result
+  , we can use it to fully configure the HTTP response
+* If we want to use it, we have to return it from the endpoint' Spring takes care of the rest
+* ResponseEntity is a generic type. Consequently, we can use any type as response body.
+
+## Spring Architecture
+
+This Spring Boot Application Architecture.
+
+POSTMan(client) <--> Controller Layer <--> Service Layer (Business Logics) <--> Repository Layer (Persistence) <---> DB
+
+* I use JPA in Repository Layer to map the object to database tables
+* I use DTO (Data Transfer Object) to map between the client and controller layer
+* I should not use JPA instead of DTO because it may cause of security issue. Which means, the controller
+  should not send and JPA to client.
+
+### ModelMapper and MapStruct
+
+These are two popular mappers to convert DTO objects to JPA objects without re-write the whole convertor manually.
+The converting between JPA and DTO will be happened in Service Layer.
+
+For ModelMapper I need to develop: (restful-webservice project DTO branch)
+
+* Add ModelMapper Maven Dependency
+* Configure ModelMapper class as Spring Bean
+* Inject and use ModelMapper Spring bean in Service class
+
+For MapSturct, I need to do these steps:
+
+* use this dependencies
+
+```
+        <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <!-- I need this repository to use MapStruct with Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+```
+
+* use this plugin so maven can create the implementation
+  file under target\generated-source\annotation automatically
+
+```   
+
+            <!-- MapStruct annotation processor -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.4.2.Final</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.20</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+```
+
+* create an interface with @Mapper annotation
+
+## Spring Bean Lifecycle
 
 Instantiate --> Populate Properties --> Call setBeanName of BeanNameAware -->
 Call setBeanFactory of BeanFactoryAware --> Call setApplicationContext of ApplicationContestAware --> Preinitialization (Bean PostProcessors) -->
