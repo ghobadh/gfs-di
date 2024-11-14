@@ -70,31 +70,63 @@ For MapSturct, I need to do these steps:
 * use this plugin so maven can create the implementation
   file under target\generated-source\annotation automatically
 
-```   
+```
+    <properties>
+        <java.version>17</java.version>
+        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
+        <org.projectlombok.version>1.18.20</org.projectlombok.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+    </properties>
+```
+
+* Under plugins added :
+
+```
 
             <!-- MapStruct annotation processor -->
-            <plugin>
+           <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
+                    <source>17</source>
+                    <target>17</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
-                            <version>1.4.2.Final</version>
+                            <version>${org.mapstruct.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.20</version>
+                            <version>${org.projectlombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
 ```
 
-* create an interface with @Mapper annotation
+* create an interface with @Mapper annotation. example
+
+```
+@Mapper//(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface AutoUserMapper extends Converter<User , UserDto> {
+    // I need to use this line for implementing the interface from the Mapper factory
+    AutoUserMapper INSTANCE = Mappers.getMapper(AutoUserMapper.class);
+
+    // if the fields are different name they have , I need to use @Mapping like this
+    //@Mapping(source = "email", target= "emailAddress")
+    UserDto mapToUserDto(User user);
+
+    User mapToUser(UserDto userDto);
+}
+```
 
 ## Spring Bean Lifecycle
 
@@ -316,6 +348,21 @@ Junit 5 needs Java 8 or higher
 
 ## Spring for exception handling
 
+When the Service layer throws an exception, we need to implements
+Spring Boot Default Error Handling Response to prevent error HTTP 500. In order to do that,
+we need to throw an ResourceNotFoundException whenever the error happens. The class ResourceNotFoundException
+is the class which handle by GlobalExceptionHandler
+
+### Exception Handling Steps
+
+* Create and use **ResourceNotFoundException** custom exception. I extend the class from RuntimeException and
+  I add @ResponseStatus(value = HttpStatus.NOT_FOUND) to the head of the class name
+* Create **ErrorDetails** class to hold of the custom error response
+* Create **GlobalExceptionHandler** class to handle specific and global exceptions. The **@ExceptionHandler** is an
+  annotation to handle the specific exception and sending the custom responses to the client. example:
+  ```@ExceptionHandler(UserNotFoundException.class)```
+
+### Exception Handling Annotation
 * @ResponseStatus - Allow you to annotate custom exception classes to indicate to the framework the HTTP status you want
   retured when that exception is throw. It is 'global' to the application
 * @ExceptionHandler - it works at the controller level and it allows you to define custom exception handling:
@@ -346,6 +393,45 @@ Junit 5 needs Java 8 or higher
   * You only define the exception class name ( no package ) and the view name
   * You can optionally define a default error page
 
+### Spring Boot Validation API
+
+* In java, the java Bean Validation API has become the de-facto standard for handling. It is very easy because I just
+  need to add ```spring-boot-starter-validation```
+  validations in Java projects
+* Hibernate Validator is the reference implementation of the validation API
+  Important Bean Annotation
+* @Null - check value is null
+* __@NotNull__ - check values is not null
+* @AssertTrue - value is true
+* @AssertFalse - value is false
+* __@Min__ - Number is equal or higher
+* __@Max__ - Number is equal or less
+* @DecimalMin - value is larger
+* @DecimalMax - value is less than
+* @Negative - values is less than zero - zero invalid
+* @NegativeOrZero - values is less than zero or zero
+* @Positvie - value is greater than zero , zero is invalid
+* @PositiveOrZero - value is greater than zero or zero
+* __@Size__ - checks if string or collection is between a min and max. It can be applied to String, Collection
+  , Map and array operation
+* @Digits - checks for integer digits and fraction digits
+* @Past - checks if date is in past
+* @PastOrPresent - checks if date is past or present
+* @Future - checks if date is in future
+* @FutureOrPresent - checks if date is present or in future
+* @Pattern - checks against RegEx pattern
+* __@NotEmpty__ - checks if value is not null nor empty (whitespace chars or empty collections).It can be
+  applied to String, Collection, Map and array operation
+* __@NonBlank__- checks string is not null nor whitespace character
+* __@Email__ - checks if the string value is an email address
+
+### Validation development steps
+
+* Add Validation Dependency
+* Add Validation Annotation to UserDto (to all Data Transition Object)
+* Enable Validation using @Valid Annoation on Create and Update REST API (in controller class)
+* Customize Validation Error Response and send back to client
+
 ### Which to use them
 
     * Depends on your specific needs
@@ -354,31 +440,6 @@ Junit 5 needs Java 8 or higher
       * if both , consider @ExceptionHandler on the controller
 
 ## Data Validation with JSR-303
-
-### Built in contraint definitions
-
-* @Null - check value is null
-* @NotNull - check values is not null
-* @AssertTrue - value is true
-* @AssertFalse - value is false
-* @Min - Number is equal or higher
-* @Max - Number is equal or less
-* @DecimalMin - value is larger
-* @DecimalMax - value is less than
-* @Negative - values is less than zero - zero invalid
-* @NegativeOrZero - values is less than zero or zero
-* @Positvie - value is greater than zero , zero is invalid
-* @PositiveOrZero - value is greater than zero or zero
-* @Size - checks if string or collection is between a min and max
-* @Digits - checks for integer digits and fraction digits
-* @Past - checks if date is in past
-* @PastOrPresent - checks if date is past or present
-* @Future - checks if date is in future
-* @FutureOrPresent - checks if date is present or in future
-* @Pattern - checks against RegEx pattern
-* @NotEmpty - checks if value is not null nor empty (whitespace chars or empty collections)
-* @NonBlank - checks string is not null nor whitespace character
-* @Email - checks if the string value is an email address
 
 ### Hibernate validation constraints ( These specific for Hibernate and not bean validation)
 
@@ -530,6 +591,11 @@ ADD RecetteProjet*.jar recette.jar
 CMD java -jar recette.jar
 ```
 
+#### Dockerizing Spring Boot Application
+
+Spring Boot Application --> Docker file (using docker build and docker run) --> docker image --> using 'dock push' -->
+docker hub
+
 #### What is a Docker Image
 
 * An image defines a Docker Container (Similar in concept to a snapshot of a VM or a class vs an instance of the class)
@@ -585,6 +651,8 @@ means, mongo understand the path as /data/db
   docker rmi \<image name\> ```
 * delete untagged (dangling) images ```
   docker rmi $(docker images -q -f dangling=true) ```
+  or
+* ```docker rmi $(docker images --filter "dangling=true" -q --no-trunc)```
 * Delete all images ```
   docker rmi $(docker images -q) ```
 
@@ -867,5 +935,135 @@ Data Type categories in MySQL:
 #### Data Model
 
 * Spring by default use Jackson to bind JSON to Java POJOs
-* 
 
+# Kafka
+
+Apache Kafka is an open-source distributed event streaming platform used by many companies for high performance data
+pipeline
+, streaming analytics, data integration, and mission-critical applications.
+
+### Cluster
+
+Since Kafka is a distributed system, it acts as a cluster. A Kafka Cluster consists of a set of broker.
+It is container of Kafka Broker. Each cluster has to keep minimum three brokers.
+
+### Broker
+
+It is basically Kafka Server. It's jsut a meaningful name given to the Kafka server and this name makes sense as well
+because all that Kafka does is act as a message broker b/c producer and consumer. The producer and consumer do not
+interact directly. They use Kafka server as an agent or
+a broker to change message
+
+### Producer
+
+Producer is an application that sends messages. It does not send messages directly to the recipient. It sends messages
+only to the Kafka server.
+
+### Consumer
+
+Consumer is an application that reads messages from the Kafka server. If producers are sending data, they must be
+sending it to someone, right? The consumer are the
+recipients. but remember that the producers don't send data to a recipient directly. They just send to Kafka server. and
+anyone who is interested in the data can come forward and take it from
+Kafka server. So, any application that requests data from a Kafka server is a consumer, and they can ask for data sent
+by any producer provided they have permission to read it.
+
+### Kafka Topic
+
+Topic is for identification mechanism to request data from a broker. There commes the notion of the topic
+
+* Topic is like a table in database or folder in a file system
+* Topic is identified by a name
+* You can have any number of Topics
+
+### Kafka Partitions
+
+Kafka topics are divided into a number of partitions, which is contain records in an unchangeable sequence.
+Kafka broker will store messages for a topic, but the capacity of data can be enormous and it may not be possible to
+store
+in a single computer. Therefore, it will paritioned into multiple parts and distributed among multiple computers, since
+Kafka is a distributed system.
+
+Several portions --> one topic
+
+Several topics --> one broker
+
+Several brokers --> one cluster
+
+### Offsets
+
+Offsets is a sequence of ids given to messages as the arrive at a partition. Once the offset is assigned
+it will never be changed. The first message gets an offset zero, The next message receives an offset
+one and so on.
+
+### Consumer Group
+
+A consumer group contains one or more consumers working together to process the messages.
+
+### Zookeeper
+
+It is managing all brokers in the cluster and all push and pull messages to the cluster.
+
+### Spring for Kafka
+
+[https://docs.spring.io/spring-kafka/reference/quick-tour.html](https://docs.spring.io/spring-kafka/reference/quick-tour.html)
+
+#### How to Set up Kafka in Spring
+
+#Kafka Consumer Setup
+spring.kafka.consumer.bootstrap-servers=192.168.23.47:9092
+spring.kafka.consumer.group-id=gForceGroup
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+#Kafka Producer Setup
+spring.kafka.producer.bootstrap-servers=192.168.23.47:9092
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringDeserializer
+
+### How to Run Kafka in Docker
+
+* Use this YAML file with name docker-compose.yml (IP address has to change in plain text host line)
+
+```
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://192.168.23.47:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+```
+
+* run the docker as this command (with space rather than '-')
+  ``` sudo docker compose up -d```
+
+* To shutdown you run this command ```sudo docker compose down```
+
+## Serialization and Deserializatin JSON on Kafka
+
+### How to send and receive a Java Object as a JSON byte [] to and from Apache Kafka
+
+Apache Kafka stores and transports byte[] . There are number of built-in serializer and deserializer but
+it does't include any for JSON. Spring Kafka created a JsonSerializer and JsonDeserializer which we can use to
+convert Java Object to and from JSON.
+
+We'll send a Java object as JSON byte[] to a Kafka topic using a `JsonSerializer`. After that, we'll configure how to
+receive a JSON byte[] and automatically convert it to a Java Object using a `JsonDeserializer`.
