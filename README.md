@@ -58,4 +58,3 @@ code. [See this link for help with compares](https://github.com/springframeworkg
 * [Spring Core](https://www.udemy.com/spring-core/) - Learn the core of Spring Framework 4!
 * [Spring Core Advanced](https://www.udemy.com/spring-core-advanced-beyond-the-basics/?couponCode=GITHUB_REPO_SF5B2G) -
   Go beyond the basics! Learn about Aspect Oriented Programming, Spring Security, using Spring Events, JMS and more!
-
