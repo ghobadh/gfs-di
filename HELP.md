@@ -1491,6 +1491,61 @@ effectively.
 By understanding what microservices truly are, developers and organizations can make more informed decisions about when
 and how to use this architecture.
 
+### Microservices Communication using RestTemplate (It will be deprecated soon)
+
+1. Add the field which is common between two service. For example, add departmentCode field in Employee JPA Entity in
+   Employee Service (springboot_mircoservice)
+2. Create a DTO class equavlient to DTO class of the other service. For example, create DepartmentDto class in
+   Employee service project which is exact of DepartmentDto class in Department Service
+3. Configure RestTemplate as Spring Bean. For example in EmployeeServiceApplication.java file, I added this bean
+
+```
+    @Bean
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
+    }
+
+```
+
+4. Inject and ude RestTemplate to make REST API call in the service concrete class. For example, in
+   springboot_microservice , I can use it in EmployyServiceImpl as like this:
+
+```  
+        ResponseEntity<DepartmentDto> departmentDtoResp = restTemplate
+                .getForEntity("http://localhost:8080/dept/code/" +
+                        employeeDto.departmentCode(), DepartmentDto.class);
+
+        DepartmentDto departmentDto = departmentDtoResp.getBody();
+        APIResponseDto apiResponseDto = new APIResponseDto();
+```
+
+### MicroServices Communication using WebClient
+
+1. Add Spring WebFlux Dependency
+2. Configure WebClient as Spring Bean
+3. Inject and Use WebClient to call the REST API
+4. Test using Postman client
+
+check master_Employee branch in springboot_microservice
+
+### MicroServices Communication using Spring Cloud Feign
+
+1. Add Spring Cloud open Feign Maven dependency. For example, I added it into employee service in
+   springboot_micrsoservice
+
+```
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+```
+
+2. Enable Feign Client using @EnableFeignClients. This annotation enables component scanning for
+   interfaces that declare they are Feign clients
+3. Create Feign API Client
+4. Change the service method (e.g getEmployeeById) method to use APIClient
+5. Test using Postman client
+
 ## Spring Cloud
 
 It covers these challenges:
@@ -1502,3 +1557,48 @@ It covers these challenges:
 * Config Server Patten (configuration management) --  __Spring Cloud Config Server__ and __GitHub__ as storage
 * Distributed tracing for logs -- __Spring Cloud Sleuth module__ and __ZIPKIN__ for log tracking
 * Organization Service 
+
+### Spring Cloud Netflix Eureka Server
+
+What is Service Registry and Discovery
+
+1. In the microservices projects, __Service Registry and Discovery__ play an important role because we most
+   likely run multiple instances of services and we need a mechanism to call other services w/o hardcoding
+   their hostnames or port numbers.
+2. In addition on that, in cloud environment service instance may come up and go down anytime. So we need some
+   automatic service registration and discovery mechanism.
+3. Spring Cloud addresses this this problem by providing __Spring Cloud Netflix Eureka__ project to create Service
+   Registry and Discovery
+
+Steps of Netflix Eureka Server development
+
+1. Create Spring boot project as microservice (service-registry)
+2. Add @EnableEurekaServer annotation
+3. Disable Eureka Server as Eureka Client. It is 2 properties which I added in application.properties file in
+   Server-Registry. By default, each Eureka Server is also a Eureka client and I am going to disable this client
+   -side behaviour by configuring these properties
+
+``` 
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+```
+
+4. Launche Eureka Server
+5. Registering the Service Microservice as Eureka Client (e.g. Department-Service) by adding Eureka Client into POM
+   and add these to properties
+
+```
+eureka.client.fetch-registry=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.client.enabled=true
+
+```
+
+6. Run department-service Eureka Client
+7. Registering the Service Microservice as Eureka Client (e.g. employee-Service) by adding Eureka Client into POM
+8. Run employee-service Eureka Client
+9. Multiple Instance of services (e.g Department-Service). For this we just create the JAR file
+   and then just run it with new port like `  java  -jar -Dserver.port=8082 depratment-service-0.0.1-SNAPSHOT.jar`.
+   You should see the new application added in Eureka web page 
+
+
