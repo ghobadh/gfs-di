@@ -360,7 +360,8 @@ is the class which handle by GlobalExceptionHandler
 * Create **ErrorDetails** class to hold of the custom error response
 * Create **GlobalExceptionHandler** class to handle specific and global exceptions. The **@ExceptionHandler** is an
   annotation to handle the specific exception and sending the custom responses to the client. example:
-  ```@ExceptionHandler(UserNotFoundException.class)```
+  ```@ExceptionHandler(UserNotFoundException.class)``` . also I need to add in the class level the annotation
+  ``` @ControllerAdvice ```
 
 ### Exception Handling Annotation
 * @ResponseStatus - Allow you to annotate custom exception classes to indicate to the framework the HTTP status you want
@@ -1599,6 +1600,25 @@ eureka.client.enabled=true
 8. Run employee-service Eureka Client
 9. Multiple Instance of services (e.g Department-Service). For this we just create the JAR file
    and then just run it with new port like `  java  -jar -Dserver.port=8082 depratment-service-0.0.1-SNAPSHOT.jar`.
-   You should see the new application added in Eureka web page 
+   You should see the new application added in Eureka web page
+
+## API Gateway
+
+It used for
+
+* route request
+* load balancer
+* security
+
+1. API Gateway provide a unified interface for a of microservices so that clients no need to know about all the details
+   of microservices internals
+2. API Gateway centralized cross-cutting like security, monitoring, rate limiting etc
+3. Spring Cloud provides __Spring Cloud Gateway__ to create API Gateway
+
+### API Gateway Development Step
+
+1. Create Spring boot project as Mircoservice (api-gateway)
+2. Register API-Gateway as Eureka Client to Eureka Server (Service Registry)
+3. Configuring API Gateway Routes and test using Postman Client
 
 
