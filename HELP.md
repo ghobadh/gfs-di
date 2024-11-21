@@ -1660,6 +1660,72 @@ Please note the automatic discover locator is expose the service name for exampl
 `GET http://localhost:9191/employee?employee_id=9` it goes in these way
 `GET http://localhost:9191/employee-service/employee?employee_id=9`
 
+## Spring Cloud Config Server
+
+To centralize all microservices in one location, I will use Spring Cloud Config Server. For to this I need to
+create a project with Spring Cloud Config Server dependency. The best place for the keeping all configuration, It can be
+GitHub Repository.
+
+### Spring Cloud Config Development Steps
+
+1. Create a Spring Boot project as Microservice (add Config server as dependency)
+2. Register Config-server as Eureka Client using properties
+
+``` 
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.client.enabled=true
+```
+
+3. Set up Git Location for Config Server
+
+``` 
+spring.cloud.config.server.git.uri=https://github.com/ghobadh/config-server-repo.git
+spring.cloud.config.server.git.clone-on-start=true
+spring.cloud.config.server.git.default-label=main
+```
+
+4. Refactor all services projects (e.go Department and Employee Services) to use Config Server. I moved all
+   configuration
+   to the repo with the service name as file name of the property. except I keep these two line
+
+``` 
+spring.application.name=employee-service
+spring.config.import=optional:configserver:http://localhost:8888
+```
+
+5. Refresh Use case. I use `@RefreshScope ` (This annotation push the spring to load this class file) in
+   messageController
+   in depratment Service . Then I use actuator option /refresh to refresh (`POST localhost:8080/actuator/refresh`) the
+   configuration without restarting the app.
+   Of course, the property `management.endpoints.web.exposure.include=*` should be set. so now, if I send a request as
+   `GET localhost:8080/message` the message will be updated.
+
+## Spring Cloud Bus
+
+1. In previous step, in order to reload the config change in Config Client application services (e.g. depratment-service
+   and employee-service), I need to
+   trigger post actuator with /refresh endpoint manually. This is not practical and viable if I have a large number of
+   applications.
+2. Spring Cloud Bus module provide the solution for manual update.
+3. Spring Cloud Bus module can be used to link multiple applications with a message broker and we can broadcast
+   configuration
+   changes.
+
+### Spring Cloud Bus Development Steps
+
+1. Add `spring-cloud-bus` dependency to services (e.g. depratment-service / employee-service)
+
+``` 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-bus</artifactId>
+        </dependency>
+```
+
+2. Install RabbitMQ using Docker
+3. RabbitMQ Configuration in application.properties of all services (e.g. depratment-service / employee-service)
+4. Create Simple REST API in one of service (e.g. employee-service)
+5. Change all services (e.g. depratment-service / employee-service) property files and call /busrefresh in actuator
 
 
 
