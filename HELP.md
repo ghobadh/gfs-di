@@ -1617,8 +1617,49 @@ It used for
 
 ### API Gateway Development Step
 
-1. Create Spring boot project as Mircoservice (api-gateway)
-2. Register API-Gateway as Eureka Client to Eureka Server (Service Registry)
-3. Configuring API Gateway Routes and test using Postman Client
+1. Create Spring boot project as Mircoservice (api-gateway). I need to use three dependency
+  1. Eureka Client
+  2. Spring Gateway
+  3. Spring Actuator
+2. Register API-Gateway as Eureka Client to Eureka Server (Service Registry). In new Spring Boot, I don't need to add
+   annotation @EnableEurekaClient into to the Spring application. I just need to do it in properties like
+
+```
+server.port=9191
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.client.enabled=true
+management.endpoints.web.exposure.include=*
+```
+
+3. Configuring API Gateway Routes and test using Postman Client. For example,
+
+```
+
+#Routes for Employee Service
+spring.cloud.gateway.routes[0].id=EMPLOYEE-SERVICE
+spring.cloud.gateway.routes[0].uri=lb://EMPLOYEE-SERVICE
+spring.cloud.gateway.routes[0].predicates[0]=Path=/employee/**
+
+# http://localhost:9191/employee
+
+#Routes for Department Service
+spring.cloud.gateway.routes[1].id=DEPRATMENT-SERVICE
+spring.cloud.gateway.routes[1].uri=lb://DEPRATMENT-SERVICE
+spring.cloud.gateway.routes[1].predicates[0]=Path=/dept/**
+```
+
+4. Using Spring Cloud Gateway to Automatically Create Routes by using these properties in API GATEWAY
+
+``` 
+spring.cloud.gateway.discovery.locator.enabled=true
+spring.cloud.gateway.discovery.locator.lower-case-service-id=true
+logging.level.org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping=DEBUG
+```
+
+Please note the automatic discover locator is expose the service name for example the like from the old way
+`GET http://localhost:9191/employee?employee_id=9` it goes in these way
+`GET http://localhost:9191/employee-service/employee?employee_id=9`
+
+
 
 
