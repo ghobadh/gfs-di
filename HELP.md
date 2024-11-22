@@ -1713,12 +1713,21 @@ spring.config.import=optional:configserver:http://localhost:8888
 
 ### Spring Cloud Bus Development Steps
 
-1. Add `spring-cloud-bus` dependency to services (e.g. depratment-service / employee-service)
+1. Add `spring-cloud-bus-amqp` dependency to services (e.g. depratment-service / employee-service)
 
 ``` 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-bus</artifactId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId> <!-- For RabbitMQ -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
         </dependency>
 ```
 
@@ -1727,5 +1736,19 @@ spring.config.import=optional:configserver:http://localhost:8888
 4. Create Simple REST API in one of service (e.g. employee-service)
 5. Change all services (e.g. depratment-service / employee-service) property files and call /busrefresh in actuator
 
+```
+POST http://127.0.0.1:8080/actuator/busrefresh
+```
 
+and the response will be like this:
+
+```
+HTTP/1.1 204 
+Date: Fri, 22 Nov 2024 03:17:55 GMT
+
+<Response body is empty>
+```
+
+Please note, in order to have actuator working, I need to setup property as
+`management.endpoints.web.exposure.include=*` otherwise, I will get 404 HTML error
 
