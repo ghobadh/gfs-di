@@ -1752,3 +1752,131 @@ Date: Fri, 22 Nov 2024 03:17:55 GMT
 Please note, in order to have actuator working, I need to setup property as
 `management.endpoints.web.exposure.include=*` otherwise, I will get 404 HTML error
 
+## Distributed Tracking
+
+One of the challenges in Microservices architecture is the ability to debug issues.
+When there are so many microservices, user request will span many of them and it will be defficult to trace the logs
+for a particular request when an issue occurs. One Simple end-user request might trigger a chain of microservices calls,
+there should be a mechanism to trace the related call chains. For this matter, I used distributed tracing with Spring
+Cloud Sleuth (deprecated), Micrometer (alternative to Sleuth) and Zipkin (visualize trace information through UI).
+The format will be [application_name,trace_id,span_id]
+
+``` 
+DEBUG [employee-service,674121cc246056f95d285ae08ea0390f,5d285ae08ea0390f] 
+```
+
+I need to add these dependencies to all microservice with exception (Eureka and Config Server)
+
+```
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-observation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.reporter2</groupId>
+			<artifactId>zipkin-reporter-brave</artifactId>
+			<version>3.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-micrometer</artifactId>
+			<version>13.3</version>
+		</dependency>
+
+```
+
+and I need to add these properties as well
+
+``` 
+management.tracing.sampling.probability=1.0
+management.zipkin.tracing.endpoint=http://192.168.23.47:9411/api/v2/spans
+logging.pattern.level=%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]
+logging.level.org.springframework.web=DEBUG
+```
+
+For Zipkin server I ran it in docker as
+`docker run -d -p 9411:9411 openzipkin/zipkin`
+
+## Circuit Breaker Patter
+
+Type of moods in CB
+
+* Open -- when the service pass the threshold and fail is to many, the service goes to open state
+* Closed -- allow all message goes to other services
+* Half Open -- after open state, if the service pass some of request, then it goet to half open state and depends
+  on the amount of failure and success threshold the state can go back to open or close state.
+  In our example which employee-service sending message to department-serivce, I need to implement the circuit breaker
+  in
+  employee-service.
+
+### Circuit Breaker Development Steps
+
+1. Add dependencies (I need to Resilience4j for this). I need actuator and aop in order to see the metric in resilience
+
+``` 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+        </dependency>
+        
+         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+                <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+```
+
+2. Using @CircuitBreaker annotation to a method which is calling the external service.
+   Example in employee-service
+   `@CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")`
+3. Fallback method implementation
+   In our example, I used name __getDefaultDepartment__ for fall back. When I create the fallback method, the return and
+   method signature should be same as the original method for example, my method name is
+
+``` 
+    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Override
+    public APIResponseDto getEmployeeById(Long id){ ...
+```
+
+so the fallback method will be like this
+
+``` 
+    public APIResponseDto getDefaultDepartment(Long id) { ....
+```
+
+4. Add Circuit Breaker Configuration in application.properties.
+
+```
+# Actuator endpoints for Circuit Breatker
+management.health.circuitbreakers.enabled=true
+management.endpoint.health.show-details=always
+management.endpoints.web.exposure.include=*
+
+#Circuit breaker cofiguration
+resilience4j.circuitbreaker.instances.employee-service.register-health-indicator=true
+resilience4j.circuitbreaker.instances.employee-service.failure-rate-threshold=50
+resilience4j.circuitbreaker.instances.employee-service.minimum-number-of-calls=5
+resilience4j.circuitbreaker.instances.employee-service.automatic-transition-from-open-to-half-open-enabled=true
+resilience4j.circuitbreaker.instances.employee-service.wait-duration-in-open-state.seconds=5
+resilience4j.circuitbreaker.instances.employee-service.permitted-number-of-calls-in-half-open-state=3
+resilience4j.circuitbreaker.instances.employee-service.sliding-window-size=10
+resilience4j.circuitbreaker.instances.employee-service.sliding-window-type=COUNT_BASED
+```
+
+In this example the endpoint exposure include can be 'health' instead of '*'.
+Also, if you check the resilience4j configuration part and you see 'employee-service'! and that is the service name.
+For each service that part would be different.
+
+5. Restart the service server
+
+
+
+
