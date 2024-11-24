@@ -1800,7 +1800,7 @@ logging.level.org.springframework.web=DEBUG
 
 For Zipkin server I ran it in docker as
 `docker run -d -p 9411:9411 openzipkin/zipkin`
-
+then I can call the application in browser like "http://192.168.23.47:9411/"
 ## Circuit Breaker Patter
 
 Type of moods in CB
@@ -1873,9 +1873,81 @@ resilience4j.circuitbreaker.instances.employee-service.sliding-window-type=COUNT
 
 In this example the endpoint exposure include can be 'health' instead of '*'.
 Also, if you check the resilience4j configuration part and you see 'employee-service'! and that is the service name.
-For each service that part would be different.
+For each service that part would be different. In addition, I change change the sliding-window-type from
+__COUNT_BASED__ to __TIME_BASED__ for changing the behaviour of waiting in half open state.
 
-5. Restart the service server
+5. Restart the service server. When I check the `http://localhost:8081/actuator/health` I sould see the circuitbreaker
+   as part of health like this (I need to make a call to the employee (e.g. `
+   GET http://localhost:9191/employee-service/employee?employee_id=9)
+   in order to see the change in health part
+
+```
+ "circuitBreakers": {
+      "status": "UP",
+      "details": {
+        "employee-service": {
+          "status": "UP",
+          "details": {
+            "failureRate": "-1.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRate": "-1.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 0,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "failedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "CLOSED"
+          }
+        }
+      }
+    },
+```
+
+### Retry Development Steps
+
+1. Using @Retry annotation to a method (it is calling to external service)
+2. Fallback method implementation (it is very similar to @CircuitBreaker)
+
+``` 
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Override
+    public APIResponseDto getEmployeeById(Long id){ ...
+```
+
+so the fallback method will be like this
+
+``` 
+    public APIResponseDto getDefaultDepartment(Long id) { ....
+```
+
+3. Add Retry configuration in application.properties
+
+``` 
+#Retry configuration
+resilience4j.retry.instances.employee-service.max-attempts=5
+resilience4j.retry.instances.employee-service.wait-duration.seconds=1
+resilience4j.retry.metrics.enabled=true
+```
+
+4. Restart the service
+
+## Add New Service to an Existing MicroService
+
+I need to add these steps in order to add a new service
+
+1. Create the XX-Service using Spring Boot
+2. Configure the database (e.g. MySQL)
+3. Create JPA Entity and Spring DAta JPA Repository
+4. Create DTO and Mapper classes
+5. Build Save REST API
+6. Build Get By Code REST API
+7. Make REST API from an existing service to new service (e.g. employee-server to organization-server)
+8. Register the new service in Eureka
+9. Refactor the new service in Config Server
+10. Configure Spring Cloud Bus
+11. Configure Routes for new service in API-Gateway
+12. Implement distribute tracing in new Service
 
 
 
