@@ -1,0 +1,3 @@
+spring.application.name=gfs-di
+spring.profiles.active=cat,EN,qa
+gforce.username=userNamefromApplicationPropertiesFile
