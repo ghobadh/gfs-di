@@ -594,7 +594,7 @@ CMD java -jar recette.jar
 
 #### Dockerizing Spring Boot Application
 
-Spring Boot Application --> Docker file (using docker build and docker run) --> docker image --> using 'dock push' -->
+Spring Boot Application --> Docker file (using docker build and docker run) --> docker image --> using 'docker push' -->
 docker hub
 
 #### What is a Docker Image
@@ -958,7 +958,24 @@ a broker to change message
 ### Producer
 
 Producer is an application that sends messages. It does not send messages directly to the recipient. It sends messages
-only to the Kafka server.
+only to the Kafka server. The most field is `private final KafkaTemplate<String, User> kafkaTemplate;` in orddeer
+to send the message to Kafka. and I use to send the message.
+
+Note: the sample JSON message (e.g. User class )should be like this
+
+```java 
+        Message<User> message = MessageBuilder
+        .withPayload(user)
+        .setHeader(KafkaHeaders.TOPIC, topicName)
+        .build();
+```
+
+If you are just using a string to send to Kafka the send message is very simple
+
+```java
+
+kafkaTemplate.send(topic, message);
+```
 
 ### Consumer
 
@@ -968,6 +985,8 @@ recipients. but remember that the producers don't send data to a recipient direc
 anyone who is interested in the data can come forward and take it from
 Kafka server. So, any application that requests data from a Kafka server is a consumer, and they can ask for data sent
 by any producer provided they have permission to read it.
+I need to use this annotation `    @KafkaListener(topics =  "${spring.kafka.topic-json.name}", groupId = "gForceGroup")`
+to define my method listener as consumer.
 
 ### Kafka Topic
 
@@ -1000,6 +1019,7 @@ one and so on.
 ### Consumer Group
 
 A consumer group contains one or more consumers working together to process the messages.
+I need to define it bye `spring.kafka.consumer.group-id=gForceGroup` and it is one par to Kafka listener
 
 ### Zookeeper
 
@@ -1011,23 +1031,29 @@ It is managing all brokers in the cluster and all push and pull messages to the 
 
 #### How to Set up Kafka in Spring
 
-#Kafka Consumer Setup
+```properties
+#Kafka Consumer Set up
 spring.kafka.consumer.bootstrap-servers=192.168.23.47:9092
 spring.kafka.consumer.group-id=gForceGroup
 spring.kafka.consumer.auto-offset-reset=earliest
 spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
 spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.properties.spring.json.trusted.packages=*
 
 #Kafka Producer Setup
 spring.kafka.producer.bootstrap-servers=192.168.23.47:9092
 spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringDeserializer
 spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringDeserializer
+```
+
+This `spring.kafka.consumer.properties.spring.json.trusted.packages=*` means, spring application will accept and trust
+all message in JSON spring
 
 ### How to Run Kafka in Docker
 
 * Use this YAML file with name docker-compose.yml (IP address has to change in plain text host line)
 
-```
+```yaml
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -1068,6 +1094,11 @@ convert Java Object to and from JSON.
 
 We'll send a Java object as JSON byte[] to a Kafka topic using a `JsonSerializer`. After that, we'll configure how to
 receive a JSON byte[] and automatically convert it to a Java Object using a `JsonDeserializer`.
+I don't need to change the key deserializaer, but I need to change the value of deserializer to
+`spring.kafka.consumer.value-deserializer= org.springframework.kafka.support.serializer.JsonDeserializer` and in
+producer
+to `spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer`
+These are availabe only in Spring boot, otherwise, I need to implment different Bean in my application
 
 ## Spring Boot Actuator
 
@@ -1082,7 +1113,7 @@ receive a JSON byte[] and automatically convert it to a Java Object using a `Jso
 * For info we need to add `management.info.env.enabled=true` to the application.property file also
 * I need to add some info in application.properties file . after 'info' you can add anything you like
 
-```
+```properties
 info.app.name= Spring Boot Restful Web Service
 info.app.description = Spring Boot Restful Web Services Demo
 info.app.version=1.0.0
@@ -1094,7 +1125,7 @@ info.app.version=1.0.0
 * In order to see more information other than the status of the application, I need to add
   `management.endpoint.health.show-details=always` to application.property file, and the result would be like this
 
-```
+```yaml
 {
   "status": "UP",
   "components": {
@@ -1240,21 +1271,34 @@ Date: Fri, 15 Nov 2024 17:25:45 GMT
 
 ### Development Steps
 
-* Adding  __springdoc-openapi__ Maven dependency
+## SpringDoc OpenAPI
 
-``` 
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.3.0</version>
-        </dependency>
+### Development Steps
+
+1. Adding springdoc-openapi Maven dependency
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+<dependency>
+  <groupId>org.springdoc</groupId>
+  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+  <version>2.7.0</version>
+</dependency>
+        <!-- SpringDoc OpenAPI dependency -->
+<dependency>
+<groupId>org.springdoc</groupId>
+<artifactId>springdoc-openapi-ui</artifactId>
+<version>1.6.14</version> <!-- Ensure you have the correct version -->
+</dependency>
 ```
 
+The second dependency should be there otherwise, I will get an error.
 I will have access using /swagger-ui/index.html `http://localhost:8080/swagger-ui/index.html`
 
-* Defining General API information (Using Annotation)
+2. Defining General API information (Using Annotation)
+   In Application class file (main class), I add this
 
-``` 
+```java
 @OpenAPIDefinition(
         info = @Info(
                 title = "Gargamel Spring Boot Doc",
@@ -1279,10 +1323,10 @@ I will have access using /swagger-ui/index.html `http://localhost:8080/swagger-u
 ) 
 ```
 
-* Customizing Swagger API Documentation with annotations
-  In class level I add @Tag
+3. Customizing Swagger API Documentation with annotations
+   In controller class level I add @Tag
 
-``` 
+```java
 @Tag(
         name = "CRUD REST APIs for User Resource",
         description = "CRUD REST APIs for User Resource for Create User, Modify User, Delete User and Get All Users"
@@ -1291,7 +1335,7 @@ I will have access using /swagger-ui/index.html `http://localhost:8080/swagger-u
 
 in method level, I need to add these tages
 
-```  
+```java 
     @Operation(
             summary = "Update User  data REST API",
             description = "Get all User RESTful API is used to get the user from MySQL"
@@ -1302,10 +1346,10 @@ in method level, I need to add these tages
     } )
 ```
 
-* Customizing Swagger Model Documentation with annotations
+4. Customizing Swagger Model Documentation with annotations
   in DTO class level. For example in UserDto.java
 
-```  
+```java  
 @Schema(
         description = "UserDto Model Information"
 )
@@ -1313,7 +1357,7 @@ in method level, I need to add these tages
 
 In above each field of DTO class, I add this to describe the schema of the class
 
-```  
+```java 
     @Schema(
             description = "User email"
     )
@@ -1500,7 +1544,7 @@ and how to use this architecture.
    Employee service project which is exact of DepartmentDto class in Department Service
 3. Configure RestTemplate as Spring Bean. For example in EmployeeServiceApplication.java file, I added this bean
 
-```
+```java
     @Bean
     public RestTemplate restTemplate(){
         return new RestTemplate();
@@ -1511,7 +1555,7 @@ and how to use this architecture.
 4. Inject and ude RestTemplate to make REST API call in the service concrete class. For example, in
    springboot_microservice , I can use it in EmployyServiceImpl as like this:
 
-```  
+```java  
         ResponseEntity<DepartmentDto> departmentDtoResp = restTemplate
                 .getForEntity("http://localhost:8080/dept/code/" +
                         employeeDto.departmentCode(), DepartmentDto.class);
@@ -1534,7 +1578,7 @@ check master_Employee branch in springboot_microservice
 1. Add Spring Cloud open Feign Maven dependency. For example, I added it into employee service in
    springboot_micrsoservice
 
-```
+```xml
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -1588,7 +1632,7 @@ eureka.client.fetch-registry=false
 5. Registering the Service Microservice as Eureka Client (e.g. Department-Service) by adding Eureka Client into POM
    and add these to properties
 
-```
+```properties
 eureka.client.fetch-registry=true
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 eureka.client.enabled=true
@@ -1624,7 +1668,7 @@ It used for
 2. Register API-Gateway as Eureka Client to Eureka Server (Service Registry). In new Spring Boot, I don't need to add
    annotation @EnableEurekaClient into to the Spring application. I just need to do it in properties like
 
-```
+```properties
 server.port=9191
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 eureka.client.enabled=true
@@ -1633,7 +1677,7 @@ management.endpoints.web.exposure.include=*
 
 3. Configuring API Gateway Routes and test using Postman Client. For example,
 
-```
+```properties
 
 #Routes for Employee Service
 spring.cloud.gateway.routes[0].id=EMPLOYEE-SERVICE
@@ -1650,7 +1694,7 @@ spring.cloud.gateway.routes[1].predicates[0]=Path=/dept/**
 
 4. Using Spring Cloud Gateway to Automatically Create Routes by using these properties in API GATEWAY
 
-``` 
+```properties
 spring.cloud.gateway.discovery.locator.enabled=true
 spring.cloud.gateway.discovery.locator.lower-case-service-id=true
 logging.level.org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping=DEBUG
@@ -1671,14 +1715,14 @@ GitHub Repository.
 1. Create a Spring Boot project as Microservice (add Config server as dependency)
 2. Register Config-server as Eureka Client using properties
 
-``` 
+```properties
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 eureka.client.enabled=true
 ```
 
 3. Set up Git Location for Config Server
 
-``` 
+```properties
 spring.cloud.config.server.git.uri=https://github.com/ghobadh/config-server-repo.git
 spring.cloud.config.server.git.clone-on-start=true
 spring.cloud.config.server.git.default-label=main
@@ -1688,7 +1732,7 @@ spring.cloud.config.server.git.default-label=main
    configuration
    to the repo with the service name as file name of the property. except I keep these two line
 
-``` 
+```properties
 spring.application.name=employee-service
 spring.config.import=optional:configserver:http://localhost:8888
 ```
@@ -1715,7 +1759,7 @@ spring.config.import=optional:configserver:http://localhost:8888
 
 1. Add `spring-cloud-bus-amqp` dependency to services (e.g. depratment-service / employee-service)
 
-``` 
+```xml
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bus-amqp</artifactId> <!-- For RabbitMQ -->
@@ -1767,7 +1811,7 @@ DEBUG [employee-service,674121cc246056f95d285ae08ea0390f,5d285ae08ea0390f]
 
 I need to add these dependencies to all microservice with exception (Eureka and Config Server)
 
-```
+```xml
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-observation</artifactId>
@@ -1791,7 +1835,7 @@ I need to add these dependencies to all microservice with exception (Eureka and 
 
 and I need to add these properties as well
 
-``` 
+``` properties
 management.tracing.sampling.probability=1.0
 management.zipkin.tracing.endpoint=http://192.168.23.47:9411/api/v2/spans
 logging.pattern.level=%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]
@@ -1817,7 +1861,7 @@ Type of moods in CB
 
 1. Add dependencies (I need to Resilience4j for this). I need actuator and aop in order to see the metric in resilience
 
-``` 
+```properties
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
@@ -1840,7 +1884,7 @@ Type of moods in CB
    In our example, I used name __getDefaultDepartment__ for fall back. When I create the fallback method, the return and
    method signature should be same as the original method for example, my method name is
 
-``` 
+```java
     @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     @Override
     public APIResponseDto getEmployeeById(Long id){ ...
@@ -1848,13 +1892,13 @@ Type of moods in CB
 
 so the fallback method will be like this
 
-``` 
+```java 
     public APIResponseDto getDefaultDepartment(Long id) { ....
 ```
 
 4. Add Circuit Breaker Configuration in application.properties.
 
-```
+```properties
 # Actuator endpoints for Circuit Breatker
 management.health.circuitbreakers.enabled=true
 management.endpoint.health.show-details=always
@@ -1881,7 +1925,7 @@ __COUNT_BASED__ to __TIME_BASED__ for changing the behaviour of waiting in half 
    GET http://localhost:9191/employee-service/employee?employee_id=9)
    in order to see the change in health part
 
-```
+```yaml
  "circuitBreakers": {
       "status": "UP",
       "details": {
@@ -1909,7 +1953,7 @@ __COUNT_BASED__ to __TIME_BASED__ for changing the behaviour of waiting in half 
 1. Using @Retry annotation to a method (it is calling to external service)
 2. Fallback method implementation (it is very similar to @CircuitBreaker)
 
-``` 
+```java
     @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     @Override
     public APIResponseDto getEmployeeById(Long id){ ...
@@ -1917,13 +1961,13 @@ __COUNT_BASED__ to __TIME_BASED__ for changing the behaviour of waiting in half 
 
 so the fallback method will be like this
 
-``` 
+```java
     public APIResponseDto getDefaultDepartment(Long id) { ....
 ```
 
 3. Add Retry configuration in application.properties
 
-``` 
+```properties
 #Retry configuration
 resilience4j.retry.instances.employee-service.max-attempts=5
 resilience4j.retry.instances.employee-service.wait-duration.seconds=1
@@ -1948,6 +1992,59 @@ I need to add these steps in order to add a new service
 10. Configure Spring Cloud Bus
 11. Configure Routes for new service in API-Gateway
 12. Implement distribute tracing in new Service
+
+# React
+
+For front end I am going to use React. Note that react does not have capability to call any Restful API so I need to use
+a third party application
+
+### React Development Steps
+
+1. Create React Ap using Create React App
+   Tool [https://create-react-app.dev/docs/getting-started](https://create-react-app.dev/docs/getting-started)
+2. Adding Bootstrap in React Using NPM
+   ```commandline
+   npx create-react-app my-app
+   cd my-app
+   npm start
+   ```
+   go to react project folder and run this `npm install bootstrap --save` and check it under node_modules bootstrap/css
+   and bootstrap/js
+
+![img.png](img.png)
+
+3. Connecting React App with API Gateway - REST API call. In order to do it, I need to install axios
+   `npm install axios --save`
+4. Develop a React component to display user, department and organization details. For ease of coding,
+   try to install "React snippet". the when you are makeing anything the snippet will help you a lot. For example,
+   __rcc__ which stand for 'React class component' , inside of the the component js file, while care the templete of the
+   class file. OR __con__ is a snippet of 'class constructor'.
+
+Note: 'props' and 'state' are both plain Javascript objects.They are different in one important way: __props__ get
+passed to the component whereas __state__ is managed within the component.
+
+Note: A CORS (Cross-Origin Resource Sharing) problem occurs when a web application tries to make a request to a resource
+on a different domain, and the server doesn't allow it due to security reasons. This is enforced by the browser's
+same-origin policy, which restricts web pages from making requests to a different domain than the one that served the
+web page2.
+Common Causes of CORS Errors:
+No Access-Control-Allow-Origin Header: The server doesn't include this header in the response, which tells the
+browser that the request is allowed from the origin.
+Incorrect Access-Control-Allow-Origin Header: The header is present but doesn't match the origin of the request.
+Method Not Allowed: The server doesn't allow certain HTTP methods (e.g., PUT, DELETE) in the
+Access-Control-Allow-Methods header.
+Preflight Request Issues: For certain requests, the browser sends a preflight request to check if the server allows
+the actual request. If the preflight request fails, the actual request is blocked.
+
+In Spring boot
+
+```properties
+spring.cloud.gateway.globalcors.cors-configurations.[/**].allowed-origins=*
+spring.cloud.gateway.globalcors.cors-configurations.[/**].allowed-methods=GET,POST,PUT,DELETE
+```
+
+5. Run React App
+
 
 
 
